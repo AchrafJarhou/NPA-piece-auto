@@ -10,9 +10,12 @@ Ce projet est un front-end React/Vite prêt à brancher sur votre back-office Wo
 
 ## Configuration API
 
-Le front utilise la variable suivante :
+Les fichiers `.env` ne sont pas versionnés. Copiez `.env.example` pour créer les deux fichiers suivants :
 
-- `VITE_API_URL` dans le fichier .env.production, c'est ici que vous renseignerez l'adresse du site woocommerce
+- `.env.development` : `VITE_API_URL=/woo-api` (le navigateur passe par le proxy Vite, ce qui évite les erreurs CORS)
+- `.env.production` : `VITE_API_URL=http://localhost/votre-wordpress`, c'est ici que vous renseignerez l'adresse du site woocommerce (cible du proxy en dev, URL de l'API au build)
+
+Relancez `npm run dev` après chaque modification d'un fichier `.env`.
 
 ## Build
 
