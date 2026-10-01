@@ -5,7 +5,7 @@ export default defineConfig(({ mode }) => {
   const prodEnv = loadEnv("production", process.cwd(), "VITE_");
   return {
     plugins: [react()],
-    base: "/ecom",
+    base: "/",
     server: {
       proxy: {
         "/woo-api": {
@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
                     .replace(/Secure/gi, "")
                     .replace(/SameSite=None/gi, "SameSite=Lax")
                     .replace(/domain=[^;]+/gi, "")
-                    .replace(/path=\/wooc\/?/gi, "path=/")
+                    .replace(/path=[^;]+/gi, "path=/")
                     .replace(/;\s*;/g, ";"),
                 );
               }
