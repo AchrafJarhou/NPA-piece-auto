@@ -1,18 +1,19 @@
-import "./index.css";
+import "./index.scss";
 
-import HomeSlider from "../../components/HomeSlider";
-import PageContent from "../../components/PageContent";
-import Advantages from "../../components/Advantages";
+import HomeHero from "../../components/HomeHero";
+import Reassurance from "../../components/Reassurance";
+import HomeFamilies from "../../components/HomeFamilies";
+import ProBanner from "../../components/ProBanner";
+import StoreLocation from "../../components/StoreLocation";
 
 export default function Home() {
   return (
-    <div className="home">
-      <PageContent slug="home" />
-      <HomeSlider />
-      <div className="apropos-wrapper">
-        <PageContent slug="a-propos" />
-        <Advantages />
-      </div>
-    </div>
+    <main className="home">
+      <HomeHero />
+      <Reassurance />
+      <HomeFamilies />
+      <ProBanner />
+      <StoreLocation />
+    </main>
   );
 }

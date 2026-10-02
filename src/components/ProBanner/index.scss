@@ -1,0 +1,104 @@
+@use "../../styles/breakpoints" as *;
+
+.pro-banner {
+  padding: 16px var(--gutter);
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.pro-banner-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background-color: var(--secondary-color);
+}
+
+.pro-banner-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.pro-banner-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background-color: var(--primary-color);
+
+  img {
+    display: block;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.pro-banner-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.pro-banner-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.pro-banner-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: var(--white-color);
+}
+
+.pro-banner-tag {
+  padding: 0 4px;
+  border-radius: var(--radius-sm);
+  background-color: var(--primary-color);
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--dark-color);
+}
+
+.pro-banner-description {
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--text-color-subtle);
+}
+
+.pro-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  .btn {
+    padding: 8px 16px;
+  }
+}
+
+@include tablet {
+  .pro-banner {
+    padding: 16px;
+  }
+
+  .pro-banner-actions,
+  .pro-banner-actions .btn {
+    flex: 1 1 100%;
+  }
+}

@@ -1,0 +1,72 @@
+@use "../../styles/breakpoints" as *;
+
+.reassurance {
+  padding: 16px var(--gutter);
+  background-color: rgba(243, 244, 245, 0.82);
+}
+
+.reassurance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  max-width: var(--container-width);
+  margin: 0 auto;
+}
+
+.reassurance-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  background-color: var(--white-color);
+  box-shadow: var(--shadow-card);
+}
+
+.reassurance-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-color-alt);
+
+  img {
+    display: block;
+    width: 27px;
+    height: 27px;
+  }
+}
+
+.reassurance-icon-highlight {
+  background-color: var(--primary-color);
+}
+
+.reassurance-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.reassurance-title {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--dark-color);
+}
+
+.reassurance-text {
+  font-size: var(--font-size-md);
+  line-height: 1.45;
+  color: var(--text-color-muted);
+}
+
+@include tablet {
+  .reassurance {
+    padding: 16px;
+  }
+}
