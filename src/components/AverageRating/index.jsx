@@ -1,4 +1,4 @@
-import "./index.css";
+import "./index.scss";
 import active from "./review-active.svg";
 import inactive from "./review-inactive.svg";
 

@@ -2,7 +2,7 @@ import { Suspense, lazy, useMemo, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FocusTrap } from "focus-trap-react";
 import { closeModal } from "../../slices/modalSlice";
-import "./index.css";
+import "./index.scss";
 
 const modalModules = import.meta.glob("../../modals/*/index.jsx");
 

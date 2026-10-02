@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { showToast } from "../../slices/toastSlice";
 import OrderDetails from "../../modals/orderDetails";
-import "./index.css";
+import "./index.scss";
 export default function Success() {
   const { orderId } = useParams();
   const dispatch = useDispatch();

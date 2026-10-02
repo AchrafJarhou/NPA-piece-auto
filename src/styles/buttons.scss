@@ -1,0 +1,63 @@
+// Boutons réutilisables sur tout le site : <a className="btn btn-primary">...</a>
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  letter-spacing: 0.84px;
+  line-height: 1.5;
+  text-align: center;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color var(--transition),
+    color var(--transition);
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--dark-color);
+
+  &:hover {
+    background-color: var(--primary-color-light);
+    color: var(--dark-color);
+  }
+}
+
+.btn-dark {
+  background-color: var(--dark-color);
+  color: var(--white-color);
+
+  &:hover {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+  }
+}
+
+.btn-light {
+  background-color: var(--surface-color-strong);
+  color: var(--dark-color);
+
+  &:hover {
+    background-color: var(--white-color);
+    color: var(--dark-color);
+  }
+}
+
+.btn-whatsapp {
+  background-color: var(--whatsapp-color);
+  color: var(--white-color);
+  font-weight: 600;
+
+  &:hover {
+    background-color: #1fb457;
+    color: var(--white-color);
+  }
+}

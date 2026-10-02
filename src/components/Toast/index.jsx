@@ -1,4 +1,4 @@
-import "./index.css";
+import "./index.scss";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { hideToast } from "../../slices/toastSlice";

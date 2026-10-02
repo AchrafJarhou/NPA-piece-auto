@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { fetchBlogPostBySlugThunk } from "../../thunkActionsCreator/blogThunks";
 import Loader from "../Loader";
 import Seo from "../Seo";
-import "./index.css";
+import "./index.scss";
 
 export default function BlogPostComponent() {
   const { slug } = useParams();

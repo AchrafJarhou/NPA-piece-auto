@@ -4,7 +4,7 @@ import { useDispatch } from "react-redux";
 import { Link, redirect } from "react-router-dom";
 import { useState, useEffect } from "react";
 import WishlistButton from "../WishlistButton";
-import "./index.css";
+import "./index.scss";
 
 export default function ProductCard({ product }) {
   const dispatch = useDispatch();

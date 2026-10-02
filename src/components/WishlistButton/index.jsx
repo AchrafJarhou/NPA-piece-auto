@@ -8,7 +8,7 @@ import {
   removeLocalWishlistItem,
 } from "../../slices/wishlistSlice";
 import { showToast } from "../../slices/toastSlice";
-import "./index.css";
+import "./index.scss";
 import active from "./favorite-active.svg";
 import inactive from "./favorite-inactive.svg";
 

@@ -1,0 +1,25 @@
+// Points de rupture responsive, à utiliser dans les fichiers .scss des composants :
+//   @use "../../styles/breakpoints" as *;
+//   @include mobile { ... }
+
+$breakpoint-mobile: 480px;
+$breakpoint-tablet: 768px;
+$breakpoint-desktop: 1024px;
+
+@mixin mobile {
+  @media (max-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: $breakpoint-tablet) {
+    @content;
+  }
+}
+
+@mixin below-desktop {
+  @media (max-width: $breakpoint-desktop) {
+    @content;
+  }
+}

@@ -1,4 +1,4 @@
-import "./index.css";
+import "./index.scss";
 import { useEffect, useState } from "react";
 import { fetchCategoriesThunk } from "../../thunkActionsCreator/categoriesThunks";
 import { useDispatch, useSelector } from "react-redux";

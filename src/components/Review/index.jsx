@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Loader from "../Loader";
-import "./index.css";
+import "./index.scss";
 import active from "./review-active.svg";
 import inactive from "./review-inactive.svg";
 

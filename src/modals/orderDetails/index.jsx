@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import SucessMessage from "../../components/SucessMessage";
-import "./index.css";
+import "./index.scss";
 
 // 1. Cache externe pour persister entre les rendus
 const ordersCache = {};

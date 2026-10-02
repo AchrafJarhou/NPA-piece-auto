@@ -8,7 +8,6 @@ export const siteSlice = createSlice({
     // url: "",
     // logoUrl: "",
     // faviconUrl: "",
-    palette: [],
   },
   reducers: {
     setSite: (state, action) => {

@@ -1,4 +1,4 @@
-import "./index.css";
+import "./index.scss";
 
 import arrowLeft from "./arrow_left.png";
 import arrowRight from "./arrow_right.png";

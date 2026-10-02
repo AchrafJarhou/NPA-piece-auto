@@ -9,7 +9,7 @@ import SimilarProducts from "../../components/SimilarProducts";
 import Review from "../../components/Review";
 import Loader from "../../components/Loader";
 
-import "./index.css";
+import "./index.scss";
 
 export default function ProductDetails() {
   const { id } = useParams();

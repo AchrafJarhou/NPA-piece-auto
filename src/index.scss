@@ -1,30 +1,6 @@
-@font-face {
-  font-family: "PlayfairDisplay";
-  src: url("./assets/fonts/PlayfairDisplay-Medium.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-}
-@font-face {
-  font-family: "PoppinsCustom";
-  src: url("./assets/fonts/Poppins-Medium.ttf") format("truetype");
-  font-weight: 700;
-  font-style: normal;
-}
-
-:root {
-  // --primary-color: #b17979;
-  // --primary-color-light: #e97575;
-  // --secondary-color: #b29a72;
-  // --surface-color: #f6ece0f6;
-  // --text-color-muted: #575757;
-  // --danger-color: #880000;
-  // --success-color: #006e18;
-  // --bg-color: #fdf5ea;
-  // --dark-color: #000000;
-  // --white-color: #ffffff;
-  --font-body: "PlayfairDisplay", sans-serif;
-  --font-heading: "PoppinsCustom", sans-serif;
-}
+@use "./styles/fonts";
+@use "./styles/variables";
+@use "./styles/buttons";
 
 * {
   box-sizing: border-box;
@@ -37,8 +13,13 @@
   //outline: 1px solid red;
 }
 body {
-  background-color: var(--bg-color);
-  color: var(--dark-color);
+  background-color: var(--page-bg-color);
+  background-image: url("./assets/images/background.png");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  color: var(--text-color);
+  font-family: var(--font-body);
   display: flex;
   flex-direction: column;
   max-width: 260lvh;
@@ -51,7 +32,7 @@ body {
 
 ::selection {
   background-color: var(--primary-color);
-  color: var(--bg-color);
+  color: var(--dark-color);
 }
 
 input,
@@ -225,7 +206,7 @@ button {
   cursor: pointer;
   border: 1px solid var(--primary-color);
   background: var(--primary-color);
-  color: var(--bg-color);
+  color: var(--dark-color);
   font-family: var(--font-heading);
   display: flex;
   align-items: center;

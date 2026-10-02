@@ -5,7 +5,7 @@ import {
 } from "../../thunkActionsCreator/cartThunks";
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import "./index.css";
+import "./index.scss";
 
 export function CartProduct({ item }) {
   const dispatch = useDispatch();

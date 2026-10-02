@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import "./index.css";
+import "./index.scss";
 import { openModal, closeModal } from "../../slices/modalSlice";
 
 export function OrderAll() {

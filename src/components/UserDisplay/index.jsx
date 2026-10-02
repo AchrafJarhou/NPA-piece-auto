@@ -7,7 +7,7 @@ import {
   fetchCurrentUserThunk,
   updateCurrentUserThunk,
 } from "../../thunkActionsCreator/userThunks";
-import "./index.css";
+import "./index.scss";
 
 export function UserDisplay() {
   const dispatch = useDispatch();

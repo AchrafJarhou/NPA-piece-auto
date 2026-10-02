@@ -1,4 +1,4 @@
-import "./index.css";
+import "./index.scss";
 import { useEffect, useState } from "react";
 import ProductCard from "../ProductCard";
 import Loader from "../Loader";

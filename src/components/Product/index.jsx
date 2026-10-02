@@ -8,7 +8,7 @@ import Seo from "../Seo";
 import WishlistButton from "../WishlistButton"; // TEMP: wishlist testing, remove before commit
 import { decodeHtml } from "../../utils/decodeHtml.js";
 
-import "./index.css";
+import "./index.scss";
 
 export default function Product({ product }) {
   const dispatch = useDispatch();

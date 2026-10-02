@@ -1,4 +1,4 @@
-import "./index.css";
+import "./index.scss";
 
 import { useSelector, useDispatch } from "react-redux";
 import { CartProduct } from "../CartProduct";

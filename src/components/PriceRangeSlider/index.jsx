@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilters } from "../../slices/filtersSlice";
-import "./index.css";
+import "./index.scss";
 
 export default function PriceRangeSlider({ onApply }) {
   const dispatch = useDispatch();

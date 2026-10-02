@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { openModal, closeModal } from "../../slices/modalSlice";
-import "./index.css";
+import "./index.scss";
 
 export default function CheckoutAuthPromptModal() {
   const dispatch = useDispatch();

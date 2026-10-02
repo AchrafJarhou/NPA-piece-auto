@@ -1,0 +1,70 @@
+// Variables globales du site : couleurs, typographie, formes, mise en page.
+// Pour changer l'apparence du site, modifier les valeurs ici uniquement.
+
+:root {
+  /* ---------- Couleurs ---------- */
+  --primary-color: #ffc700; // jaune NPA : boutons, accents
+  --primary-color-light: #ffd84d; // jaune au survol
+  --primary-color-dark: #745b00; // jaune foncé : petits titres sur fond clair
+  --secondary-color: #1a1c1e; // gris anthracite : blocs sombres
+
+  --dark-color: #000000;
+  --white-color: #ffffff;
+
+  --text-color: #1a1c1e; // texte principal sur fond clair
+  --text-color-muted: #45474a; // texte secondaire sur fond clair
+  --text-color-light: #c9cacc; // texte secondaire sur fond sombre
+  --text-color-subtle: #a3a5a8; // texte discret sur fond sombre
+  --separator-color: #838486;
+
+  --bg-color: #f8f9fa; // fond clair des sections
+  --surface-color: #f3f4f5; // fonds gris clair (champs, badges)
+  --surface-color-alt: #edeeef;
+  --surface-color-strong: #e1e3e4;
+  --page-bg-color: #000000; // derrière l'image de fond
+
+  --danger-color: #ba1a1a;
+  --success-color: #1e7a3c;
+  --whatsapp-color: #25d366;
+
+  /* ---------- Typographie ---------- */
+  --font-heading: "Barlow Condensed", sans-serif; // titres, boutons, labels
+  --font-body: "Plus Jakarta Sans", sans-serif; // texte courant
+
+  --font-size-xs: 12px;
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-2xl: 38px;
+  --font-size-hero: clamp(44px, 5vw, 64px);
+
+  --letter-spacing-wide: 0.8px;
+
+  /* ---------- Formes et ombres ---------- */
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 6px;
+  --radius-xl: 8px;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-panel: 0 10px 40px rgba(0, 0, 0, 0.35);
+
+  /* ---------- Mise en page ---------- */
+  --container-width: 1392px;
+  --gutter: 24px;
+  --transition: 0.2s ease;
+
+  /* ---------- Image de fond ---------- */
+  --overlay-strong: rgba(0, 0, 0, 0.85);
+  --overlay-medium: rgba(0, 0, 0, 0.55);
+  --overlay-light: rgba(0, 0, 0, 0.35);
+  --section-light-bg: rgba(248, 249, 250, 0.82); // sections claires semi-transparentes
+  --hero-overlay: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0.6) 50%,
+    rgba(0, 0, 0, 0.36) 100%
+  ); // dégradé sombre derrière le texte de l'accueil
+}

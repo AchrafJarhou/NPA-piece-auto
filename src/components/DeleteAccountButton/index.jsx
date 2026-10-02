@@ -1,7 +1,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { deleteCurrentUserThunk } from "../../thunkActionsCreator/userThunks";
-import "./index.css";
+import "./index.scss";
 
 export default function DeleteAccountButton() {
   const dispatch = useDispatch();

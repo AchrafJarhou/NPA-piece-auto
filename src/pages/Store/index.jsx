@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import Feed from "../../components/Feed";
 import Filters from "../../components/Filters";
-import "./index.css";
+import "./index.scss";
 
 export default function Store() {
   const catId = useSelector((state) => state.filters.category);

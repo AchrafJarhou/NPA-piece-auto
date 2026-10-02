@@ -1,4 +1,4 @@
-import "./index.css";
+import "./index.scss";
 
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";

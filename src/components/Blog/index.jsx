@@ -5,7 +5,7 @@ import Seo from "../../components/Seo";
 import { Link } from "react-router-dom";
 import Loader from "../Loader";
 import { decodeHtml } from "../../utils/decodeHtml";
-import "./index.css";
+import "./index.scss";
 
 function formatDate(value) {
   if (!value) return "";

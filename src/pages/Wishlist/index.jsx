@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { fetchWishlistThunk } from "../../thunkActionsCreator/wishlistThunks";
 import ProductCard from "../../components/ProductCard";
-import "./index.css";
+import "./index.scss";
 import Loader from "../../components/Loader";
 
 export default function Wishlist() {

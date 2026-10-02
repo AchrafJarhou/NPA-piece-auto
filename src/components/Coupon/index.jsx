@@ -1,4 +1,4 @@
-import "./index.css";
+import "./index.scss";
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import {
