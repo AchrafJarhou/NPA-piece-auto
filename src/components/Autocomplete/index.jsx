@@ -3,10 +3,10 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilters } from "../../slices/filtersSlice";
 import { fetchProductsThunk } from "../../thunkActionsCreator/productsThunks";
-import "./index.css";
+import "./index.scss";
 import { decodeHtml } from "../../utils/decodeHtml";
 
-export default function Autocomplete() {
+export default function Autocomplete({ placeholder = "Rechercher..." }) {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -49,7 +49,7 @@ export default function Autocomplete() {
       <input
         type="search"
         className="autocomplete-input"
-        placeholder="Rechercher..."
+        placeholder={placeholder}
         value={search}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
