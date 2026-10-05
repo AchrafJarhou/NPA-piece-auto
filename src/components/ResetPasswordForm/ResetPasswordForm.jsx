@@ -1,3 +1,4 @@
+import "../AuthForm/index.scss";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 
@@ -23,41 +24,43 @@ export default function ResetPasswordForm() {
   };
 
   return (
-    <>
-      <h1>Mot de passe oublié</h1>
-      <p className="auth-modal__subtitle">
-        Recevez un lien pour réinitialiser votre mot de passe
-      </p>
+    <form className="auth-form" onSubmit={handleSubmit} noValidate>
+      <div className="auth-form-field">
+        <label htmlFor="reset-email" className="auth-form-label">
+          Votre email
+        </label>
+        <input
+          id="reset-email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="auth-form-input"
+          autoComplete="email"
+          placeholder="votre.email@domaine.fr"
+          autoFocus
+          required
+        />
+      </div>
 
-      <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <div className="auth-form__field">
-          <label htmlFor="reset-email">Votre email</label>
-          <input
-            id="reset-email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            autoComplete="email"
-            required
-          />
-        </div>
+      {message && (
+        <p className="auth-form-server-error" role="alert">
+          {message}
+        </p>
+      )}
 
-        {message && <p className="auth-form__server-error">{message}</p>}
+      <button type="submit" className="btn btn-primary auth-form-submit">
+        Envoyer le lien
+      </button>
 
-        <button className="auth-form__submit" type="submit">
-          Envoyer le lien
-        </button>
-      </form>
-
-      <p className="auth-modal__footer">
+      <p className="auth-form-footer">
         <button
           type="button"
-          className="auth-modal__link"
+          className="auth-form-switch"
           onClick={() => dispatch(updateModalProps({ view: "login" }))}
         >
           Retour à la connexion
         </button>
       </p>
-    </>
+    </form>
   );
 }
