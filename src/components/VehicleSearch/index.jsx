@@ -1,31 +1,98 @@
 import "./index.scss";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { setFilters } from "../../slices/filtersSlice";
+import { fetchVehicleChildrenThunk } from "../../thunkActionsCreator/vehiclesThunks";
 import { site } from "../../config/site";
 
-const emptyForm = { brand: "", model: "", engine: "", reference: "" };
+// Liste déroulante remplie uniquement avec les véhicules créés dans WordPress
+function VehicleSelect({ label, placeholder, options, value, onChange, disabled }) {
+  return (
+    <select
+      className="vehicle-search-input"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      disabled={disabled}
+      aria-label={label}
+    >
+      <option value="">{placeholder}</option>
+      {(options || []).map((option) => (
+        <option key={option.id} value={option.id}>
+          {option.name}
+        </option>
+      ))}
+    </select>
+  );
+}
 
 export default function VehicleSearch() {
-  const [form, setForm] = useState(emptyForm);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const byParent = useSelector((state) => state.vehicles.byParent);
+  const currentVehicle = useSelector((state) => state.filters.vehicle);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  // On repart du véhicule déjà choisi (bouton "Changer" du catalogue)
+  const [brandId, setBrandId] = useState(currentVehicle?.brandId || "");
+  const [modelId, setModelId] = useState(currentVehicle?.modelId || "");
+  const [engineId, setEngineId] = useState(currentVehicle?.engineId || "");
+  const [reference, setReference] = useState("");
+
+  useEffect(() => {
+    dispatch(fetchVehicleChildrenThunk(0));
+  }, [dispatch]);
+  useEffect(() => {
+    if (brandId) dispatch(fetchVehicleChildrenThunk(brandId));
+  }, [brandId, dispatch]);
+  useEffect(() => {
+    if (modelId) dispatch(fetchVehicleChildrenThunk(modelId));
+  }, [modelId, dispatch]);
+
+  const brands = byParent[0];
+  const models = brandId ? byParent[brandId] : [];
+  const engines = modelId ? byParent[modelId] : [];
+  const findName = (list, id) => list?.find((item) => String(item.id) === String(id))?.name || "";
+
+  const changeBrand = (id) => {
+    setBrandId(id);
+    setModelId("");
+    setEngineId("");
+  };
+  const changeModel = (id) => {
+    setModelId(id);
+    setEngineId("");
   };
 
-  // La référence est prioritaire, sinon on cherche avec les infos du véhicule
+  const canSubmit = Boolean(brandId || reference.trim());
+
+  // On filtre sur le niveau le plus précis choisi (motorisation > modèle > marque)
   const handleSubmit = (e) => {
     e.preventDefault();
-    const search =
-      form.reference.trim() ||
-      [form.brand, form.model, form.engine]
-        .map((value) => value.trim())
-        .filter(Boolean)
-        .join(" ");
-    dispatch(setFilters({ search, category: "" }));
+    if (!canSubmit) return;
+    const vehicleId = engineId || modelId || brandId;
+    const vehicle = vehicleId
+      ? {
+          id: Number(vehicleId),
+          brandId,
+          modelId,
+          engineId,
+          brand: findName(brands, brandId),
+          model: findName(models, modelId),
+          engine: findName(engines, engineId),
+        }
+      : null;
+    dispatch(
+      setFilters({
+        vehicle,
+        search: reference.trim(),
+        category: "",
+        min_price: "",
+        max_price: "",
+        stock_status: "",
+        brands: [],
+        attributes: {},
+      }),
+    );
     navigate("/catalogue");
   };
 
@@ -45,29 +112,29 @@ export default function VehicleSearch() {
           Étape 1 : choisissez votre véhicule
         </legend>
         <div className="vehicle-search-fields">
-          <input
-            name="brand"
-            value={form.brand}
-            onChange={handleChange}
-            placeholder="1. Marque (ex: Renault)"
-            aria-label="Marque"
-            className="vehicle-search-input"
+          <VehicleSelect
+            label="Marque"
+            placeholder={brands ? "1. Marque" : "Chargement…"}
+            options={brands}
+            value={brandId}
+            onChange={changeBrand}
+            disabled={!brands?.length}
           />
-          <input
-            name="model"
-            value={form.model}
-            onChange={handleChange}
+          <VehicleSelect
+            label="Modèle"
             placeholder="2. Modèle"
-            aria-label="Modèle"
-            className="vehicle-search-input"
+            options={models}
+            value={modelId}
+            onChange={changeModel}
+            disabled={!brandId || !models?.length}
           />
-          <input
-            name="engine"
-            value={form.engine}
-            onChange={handleChange}
-            placeholder="3. Motorisation / Année"
-            aria-label="Motorisation ou année"
-            className="vehicle-search-input"
+          <VehicleSelect
+            label="Motorisation"
+            placeholder="3. Motorisation"
+            options={engines}
+            value={engineId}
+            onChange={setEngineId}
+            disabled={!modelId || !engines?.length}
           />
         </div>
       </fieldset>
@@ -78,19 +145,23 @@ export default function VehicleSearch() {
             Étape 2 : référence d'origine constructeur OEM ou mot-clé
           </label>
           <span className="vehicle-search-example">
-            Ex: 7701208422, 1611837880, Plaquettes Clio 4
+            Ex: 7701208422, 1611837880, Plaquettes
           </span>
         </div>
         <div className="vehicle-search-reference">
           <input
             id="vehicle-search-reference"
-            name="reference"
-            value={form.reference}
-            onChange={handleChange}
+            value={reference}
+            onChange={(e) => setReference(e.target.value)}
             placeholder="Référence OEM, code article équipementier…"
+            maxLength={80}
             className="vehicle-search-input vehicle-search-input-reference"
           />
-          <button type="submit" className="btn btn-primary vehicle-search-submit">
+          <button
+            type="submit"
+            className="btn btn-primary vehicle-search-submit"
+            disabled={!canSubmit}
+          >
             Trouver mes pièces compatibles
           </button>
         </div>

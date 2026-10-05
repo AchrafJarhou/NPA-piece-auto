@@ -99,6 +99,20 @@
   &::placeholder {
     color: var(--text-color-muted);
   }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+select.vehicle-search-input {
+  cursor: pointer;
+}
+
+.vehicle-search-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .vehicle-search-reference-header {

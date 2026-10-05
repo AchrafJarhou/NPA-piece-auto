@@ -1,47 +1,67 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
+const hasValue = (value) =>
+  value !== undefined && value !== null && value !== "";
+
+// Transforme les filtres du store en paramètres de l'API WooCommerce Store
+export function buildProductsQuery(params = {}) {
+  const query = new URLSearchParams();
+  query.set("page", String(params.page || 1));
+  query.set("per_page", String(params.per_page || 12));
+
+  ["search", "category", "orderby", "order", "stock_status"].forEach((key) => {
+    if (hasValue(params[key])) query.set(key, String(params[key]));
+  });
+
+  // Les prix sont envoyés en centimes
+  ["min_price", "max_price"].forEach((key) => {
+    if (hasValue(params[key])) {
+      query.set(key, String(Math.round(parseFloat(params[key]) * 100)));
+    }
+  });
+
+  if (params.brands?.length) query.set("brand", params.brands.join(","));
+  // Seul l'identifiant du véhicule est envoyé, le serveur vérifie qu'il existe
+  if (params.vehicle?.id) query.set("vehicle", String(params.vehicle.id));
+
+  Object.entries(params.attributes || {}).forEach(([taxonomy, slugs], i) => {
+    query.set(`attributes[${i}][attribute]`, taxonomy);
+    slugs.forEach((slug, j) => query.set(`attributes[${i}][slug][${j}]`, slug));
+  });
+  if (Object.keys(params.attributes || {}).length > 1) {
+    query.set("attribute_relation", "and");
+  }
+
+  return query;
+}
+
 export const fetchProductsThunk = createAsyncThunk(
   "products/fetchAll",
   async (params = {}, thunkAPI) => {
     try {
-      const page = params.page ? parseInt(params.page, 10) : 1;
-      const perPage = params.per_page ? parseInt(params.per_page, 10) : 20;
-      const minPrice =
-        params.min_price !== undefined &&
-        params.min_price !== null &&
-        params.min_price !== ""
-          ? Math.round(parseFloat(params.min_price) * 100)
-          : undefined;
-      const maxPrice =
-        params.max_price !== undefined &&
-        params.max_price !== null &&
-        params.max_price !== ""
-          ? Math.round(parseFloat(params.max_price) * 100)
-          : undefined;
-      const cleanParams = Object.entries({
-        ...params,
-        page,
-        per_page: perPage,
-        min_price: minPrice,
-        max_price: maxPrice,
-      }).reduce((acc, [key, value]) => {
-        if (value !== undefined && value !== null && value !== "") {
-          acc[key] = String(value);
-        }
-        return acc;
-      }, {});
-      const queryString = new URLSearchParams(cleanParams).toString();
-      const url = `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/products?${queryString}`;
+      const query = buildProductsQuery(params);
+      const url = `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/products?${query}`;
       const response = await fetch(url, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
       if (!response.ok) {
+        // Véhicule refusé par le serveur (supprimé, ou donnée modifiée dans le navigateur)
+        const errorData = await response.json().catch(() => ({}));
+        if (errorData.code === "invalid_vehicle") {
+          return thunkAPI.rejectWithValue("invalid_vehicle");
+        }
         throw new Error("Impossible de récupérer les produits.");
       }
       const data = await response.json();
 
-      return { data, page, perPage };
+      return {
+        data,
+        page: Number(query.get("page")),
+        perPage: Number(query.get("per_page")),
+        total: Number(response.headers.get("X-WP-Total")) || data.length,
+        totalPages: Number(response.headers.get("X-WP-TotalPages")) || 1,
+      };
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }

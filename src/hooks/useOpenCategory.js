@@ -17,10 +17,17 @@ export default function useOpenCategory() {
 
   return (slug) => {
     const category = categories.find((cat) => cat.slug === slug);
+    // Les filtres d'une autre catégorie ne s'appliquent plus : on repart de zéro,
+    // sauf le véhicule choisi, qui reste actif d'une catégorie à l'autre
     dispatch(
       setFilters({
         category: category ? String(category.id) : "",
         search: "",
+        min_price: "",
+        max_price: "",
+        stock_status: "",
+        brands: [],
+        attributes: {},
       }),
     );
     navigate("/catalogue");

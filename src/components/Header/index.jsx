@@ -9,12 +9,7 @@ import useOpenCategory from "../../hooks/useOpenCategory";
 import { site } from "../../config/site";
 import { headerCategories } from "./categories";
 import logo from "../../assets/images/logo.png";
-
-function formatPrice(totals) {
-  if (!totals) return "0,00 €";
-  const value = parseInt(totals.total_price, 10) / 100;
-  return `${value.toFixed(2).replace(".", ",")} €`;
-}
+import { formatPrice } from "../../utils/formatPrice";
 
 export default function Header() {
   const [isHidden, setIsHidden] = useState(false);
@@ -151,7 +146,7 @@ export default function Header() {
           aria-label={`Mon panier (${cartCount} article${cartCount > 1 ? "s" : ""})`}
         >
           <span className="header-cart-count">{cartCount} · Mon panier</span>
-          <span className="header-cart-total">{formatPrice(cartTotals)}</span>
+          <span className="header-cart-total">{formatPrice(cartTotals?.total_price, cartTotals?.currency_minor_unit)}</span>
         </Link>
       </div>
 

@@ -1,0 +1,302 @@
+.catalogue-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background-color: var(--white-color);
+  box-shadow: var(--shadow-card);
+
+  // Remise à zéro des styles globaux des boutons
+  button {
+    width: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+
+    &:hover {
+      background: none;
+    }
+  }
+}
+
+.catalogue-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.catalogue-card-brand {
+  display: flex;
+  flex-direction: column;
+}
+
+.catalogue-card-brand-name {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--dark-color);
+}
+
+.catalogue-card-sku {
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--text-color-muted);
+}
+
+.catalogue-card-header-aside {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .wishlist-button {
+    width: 28px;
+    height: 28px;
+    margin: 0;
+    padding: 4px;
+    border-color: var(--surface-color-strong);
+    background-color: var(--white-color);
+  }
+}
+
+.catalogue-card-badge {
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-color);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--dark-color);
+}
+
+.catalogue-card-badge-highlight {
+  background-color: var(--primary-color);
+}
+
+.catalogue-card-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: repeating-linear-gradient(45deg, #eceef0 0 10px, #f5f6f7 10px 20px);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background-color: var(--white-color);
+  }
+}
+
+.catalogue-card-placeholder {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: var(--font-size-xs);
+  color: var(--separator-color);
+}
+
+.catalogue-card-name {
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--dark-color);
+
+  &:hover {
+    color: var(--primary-color-dark);
+  }
+}
+
+.catalogue-card-description {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font-body);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--text-color-muted);
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.catalogue-card-specs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-color);
+}
+
+.catalogue-card-spec {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 4px;
+
+  dt,
+  dd {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    line-height: 1.5;
+    color: var(--text-color-muted);
+  }
+}
+
+/* ---------- Disponibilité ---------- */
+.catalogue-card-stock {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.catalogue-card-stock-text {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--text-color);
+
+  // Pastille de couleur
+  &::before {
+    content: "";
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+  }
+}
+
+.catalogue-card-stock-detail {
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--text-color-muted);
+}
+
+.catalogue-card-stock.is-backorder .catalogue-card-stock-text::before {
+  background-color: var(--primary-color-dark);
+}
+
+.catalogue-card-stock.is-out-of-stock .catalogue-card-stock-text {
+  color: var(--text-color-muted);
+
+  &::before {
+    background-color: var(--separator-color);
+  }
+}
+
+/* ---------- Prix et ajout au panier ---------- */
+.catalogue-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.catalogue-card-prices {
+  display: flex;
+  flex-direction: column;
+}
+
+.catalogue-card-regular-price {
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  text-decoration: line-through;
+  color: var(--separator-color);
+}
+
+.catalogue-card-price {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--dark-color);
+}
+
+.catalogue-card-tax {
+  margin-left: 4px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-color-muted);
+}
+
+.catalogue-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.catalogue-card-quantity {
+  display: flex;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-color);
+
+  button {
+    width: 28px;
+    height: 36px;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+  }
+
+  span {
+    width: 22px;
+    font-size: var(--font-size-md);
+    line-height: 1.5;
+    text-align: center;
+    color: var(--text-color);
+  }
+}
+
+.catalogue-card .catalogue-card-add {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background-color: var(--primary-color);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--dark-color);
+  cursor: pointer;
+  transition: background-color var(--transition);
+
+  &:hover {
+    background-color: var(--primary-color-light);
+  }
+
+  &:disabled {
+    background-color: var(--surface-color-strong);
+    color: var(--separator-color);
+    cursor: not-allowed;
+  }
+}
+
+.catalogue-card-choose {
+  padding: 8px 14px;
+}

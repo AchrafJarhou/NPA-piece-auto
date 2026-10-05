@@ -7,6 +7,13 @@ add_action('rest_api_init', function () {
         'permission_callback' => '__return_true',
     ]);
 
+    // Compteurs des filtres du catalogue (même paramètres que /products, véhicule compris)
+    register_rest_route('custom/v1', '/products-collection-data', [
+        'methods'             => 'GET',
+        'callback'            => 'headless_get_products_collection_data',
+        'permission_callback' => '__return_true',
+    ]);
+
     register_rest_route('custom/v1', '/products/(?P<id>[\w-]+)', [
         'methods'             => 'GET',
         'callback'            => 'headless_get_single_product_with_variation_stock',
@@ -49,13 +56,80 @@ function headless_enrich_variation_stock($product_data)
     return $product_data;
 }
 
+/**
+ * Transforme le paramètre "vehicle" (identifiant d'un véhicule de la taxonomie
+ * product_vehicle) en liste de produits compatibles, passée à l'API WooCommerce
+ * avec "include". Le véhicule est vérifié côté serveur : seul un identifiant
+ * existant dans la taxonomie est accepté. Les véhicules enfants sont inclus
+ * (choisir un modèle renvoie les pièces de toutes ses motorisations).
+ */
+function headless_store_query_params($request)
+{
+    $params = $request->get_query_params();
+    unset($params['vehicle'], $params['include']);
+
+    $raw_vehicle = $request->get_param('vehicle');
+    if ($raw_vehicle === null || $raw_vehicle === '') {
+        return $params;
+    }
+
+    $vehicle_id = absint($raw_vehicle);
+    $vehicle    = $vehicle_id ? get_term($vehicle_id, 'product_vehicle') : null;
+    if (!$vehicle || is_wp_error($vehicle)) {
+        return new WP_Error('invalid_vehicle', 'Véhicule inconnu.', ['status' => 400]);
+    }
+
+    $product_ids = get_posts([
+        'post_type'      => 'product',
+        'post_status'    => 'publish',
+        'fields'         => 'ids',
+        'posts_per_page' => -1,
+        'tax_query'      => [[
+            'taxonomy'         => 'product_vehicle',
+            'field'            => 'term_id',
+            'terms'            => $vehicle_id,
+            'include_children' => true,
+        ]],
+    ]);
+
+    // Aucun produit compatible : un identifiant inexistant garantit une liste vide
+    $params['include'] = $product_ids ?: [PHP_INT_MAX];
+    return $params;
+}
+
+function headless_get_products_collection_data($request)
+{
+    $params = headless_store_query_params($request);
+    if (is_wp_error($params)) {
+        return $params;
+    }
+
+    $store_request = new WP_REST_Request('GET', '/wc/store/v1/products/collection-data');
+    $store_request->set_query_params($params);
+    $store_response = rest_do_request($store_request);
+
+    if ($store_response->is_error()) {
+        $error = $store_response->as_error();
+        return $error instanceof WP_Error
+            ? $error
+            : new WP_Error('collection_data_failed', 'Impossible de calculer les filtres.', ['status' => 500]);
+    }
+
+    return rest_ensure_response($store_response->get_data());
+}
+
 function headless_get_products_with_variation_stock($request)
 {
     if (!function_exists('wc_get_product')) {
         return new WP_Error('woocommerce_unavailable', 'WooCommerce est requis pour cette fonctionnalite.', ['status' => 500]);
     }
+    $params = headless_store_query_params($request);
+    if (is_wp_error($params)) {
+        return $params;
+    }
+
     $store_request = new WP_REST_Request('GET', '/wc/store/v1/products');
-    $store_request->set_query_params($request->get_query_params());
+    $store_request->set_query_params($params);
 
     $store_response = rest_do_request($store_request);
 
