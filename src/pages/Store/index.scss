@@ -1,21 +1,98 @@
-.store-page {
-  position: relative;
-  width: 100%;
+@use "../../styles/breakpoints" as *;
+
+// On annule la marge globale appliquée à <main> dans index.scss
+main.store-page {
+  display: flex;
+  flex-direction: column;
   margin: 0;
-  .category-bg {
-    position: fixed;
-    width: 100%;
-    max-width: 260lvh;
-    margin: auto;
-    // min-height: 100lvh;
-    object-fit: contain;
-    z-index: -1;
-    top: 0;
-    left: 0;
-    right: 0;
-    background:
-      linear-gradient(rgba(253, 245, 234, 0.55), rgba(253, 245, 234, 0.55)),
-      var(--cat-bg, none) center / cover no-repeat;
+}
+
+.store-page-body {
+  flex: 1;
+  background-color: rgba(248, 249, 250, 0.92);
+}
+
+.store-page-layout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: var(--gutter);
+}
+
+.store-page-results {
+  display: flex;
+  flex: 999 1 520px;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  scroll-margin-top: 24px;
+}
+
+.store-page-recommendation {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 16px 20px;
+  border-radius: var(--radius-md);
+  background-color: var(--surface-color);
+}
+
+.store-page-recommendation-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--dark-color);
+}
+
+.store-page-recommendation-text {
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--text-color-muted);
+}
+
+.store-page-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
+  transition: opacity var(--transition);
+
+  // Pendant le chargement d'une autre page, les cartes actuelles restent visibles
+  &.is-loading {
     opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.store-page-message {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  margin: 0;
+  padding: 24px;
+  border-radius: var(--radius-md);
+  background-color: var(--white-color);
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+  color: var(--text-color);
+
+  p {
+    margin: 0;
+    font-family: var(--font-body);
+    font-size: var(--font-size-md);
+    color: var(--text-color);
+  }
+}
+
+@include tablet {
+  .store-page-layout {
+    gap: 16px;
+    padding: 16px;
   }
 }

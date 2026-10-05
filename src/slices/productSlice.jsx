@@ -1,6 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
 // Importation de la nouvelle action thunk
-import { fetchProductsThunk, fetchProductByIdThunk } from "../thunkActionsCreator/productsThunks";
+import {
+  fetchProductsThunk,
+  fetchProductByIdThunk,
+  fetchSearchSuggestionsThunk,
+} from "../thunkActionsCreator/productsThunks";
 
 export const productsSlice = createSlice({
   name: "products",
@@ -8,10 +12,15 @@ export const productsSlice = createSlice({
     list: {
       data: [],
       page: 1,
-      perPage: 20,
+      perPage: 12,
+      total: 0,
+      totalPages: 1,
     },
     loading: false,
     error: null,
+    currentRequestId: null,
+    // Suggestions de la recherche du header, séparées du catalogue
+    suggestions: [],
     // Nouveaux états pour stocker les détails d'un seul produit
     singleProduct: null,
     loadingSingle: false,
@@ -20,23 +29,24 @@ export const productsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(fetchProductsThunk.pending, (state) => {
+      .addCase(fetchProductsThunk.pending, (state, action) => {
         state.loading = true;
+        state.error = null;
+        state.currentRequestId = action.meta.requestId;
       })
       .addCase(fetchProductsThunk.fulfilled, (state, action) => {
+        // On ignore les réponses d'anciennes requêtes arrivées en retard
+        if (action.meta.requestId !== state.currentRequestId) return;
         state.loading = false;
-        const { data, page, perPage } = action.payload;
-        if (page === 1) {
-          state.list.data = data;
-        } else {
-          state.list.data = [...state.list.data, ...data];
-        }
-        state.list.page = page;
-        state.list.perPage = perPage;
+        state.list = action.payload;
       })
       .addCase(fetchProductsThunk.rejected, (state, action) => {
+        if (action.meta.requestId !== state.currentRequestId) return;
         state.loading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchSearchSuggestionsThunk.fulfilled, (state, action) => {
+        state.suggestions = action.payload;
       })
       
       // Nouveaux cas pour le produit unique

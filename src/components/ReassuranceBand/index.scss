@@ -1,0 +1,67 @@
+@use "../../styles/breakpoints" as *;
+
+.reassurance-band {
+  padding: var(--gutter);
+  background-color: rgba(26, 28, 30, 0.94);
+}
+
+.reassurance-band-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  max-width: var(--container-width);
+  margin: 0 auto;
+}
+
+.reassurance-band-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.reassurance-band-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-color);
+
+  img {
+    display: block;
+    width: 25px;
+    height: 25px;
+  }
+}
+
+.reassurance-band-icon-highlight {
+  background-color: var(--primary-color);
+}
+
+.reassurance-band-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.reassurance-band-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: var(--white-color);
+}
+
+.reassurance-band-text {
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--text-color-subtle);
+}
+
+@include tablet {
+  .reassurance-band {
+    padding: 20px 16px;
+  }
+}

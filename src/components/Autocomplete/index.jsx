@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setFilters } from "../../slices/filtersSlice";
-import { fetchProductsThunk } from "../../thunkActionsCreator/productsThunks";
+import { fetchSearchSuggestionsThunk } from "../../thunkActionsCreator/productsThunks";
 import "./index.scss";
 import { decodeHtml } from "../../utils/decodeHtml";
 
@@ -12,11 +12,16 @@ export default function Autocomplete({ placeholder = "Rechercher..." }) {
   const navigate = useNavigate();
   const search = useSelector((state) => state.filters.search);
   const [focused, setFocused] = useState(false);
-  const filters = useSelector((state) => state.filters);
-  const { list, loading, error } = useSelector((state) => state.products);
+  const suggestions = useSelector((state) => state.products.suggestions);
+
+  // Suggestions chargées 300 ms après la dernière frappe
   useEffect(() => {
-    dispatch(fetchProductsThunk({ ...filters, page: 1, per_page: 20 }));
-  }, [filters, dispatch]);
+    if (!search.trim()) return;
+    const timeout = setTimeout(() => {
+      dispatch(fetchSearchSuggestionsThunk({ search, per_page: 6 }));
+    }, 300);
+    return () => clearTimeout(timeout);
+  }, [search, dispatch]);
 
   const handleChange = (e) => {
     if (location.pathname !== "/catalogue") {
@@ -25,6 +30,9 @@ export default function Autocomplete({ placeholder = "Rechercher..." }) {
           category: "",
           min_price: "",
           max_price: "",
+          stock_status: "",
+          brands: [],
+          attributes: {},
           search: e.target.value,
         }),
       );
@@ -60,13 +68,13 @@ export default function Autocomplete({ placeholder = "Rechercher..." }) {
         aria-label="Rechercher"
       />
 
-      {focused && list.data.length > 0 && (
+      {focused && search.trim() && suggestions.length > 0 && (
         <ul
           className="autocomplete-suggestions"
           onMouseDown={(e) => e.preventDefault()}
           tabIndex="-1"
         >
-          {list.data.map((product) => (
+          {suggestions.map((product) => (
             <li key={product.id}>
               <Link
                 to={`/product/${product.id}`}
