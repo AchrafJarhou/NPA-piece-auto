@@ -65,8 +65,8 @@ export const site = {
     pickupInStock: "Retrait au comptoir dans 2h, articles en stock",
     pickupOnOrder: "Retrait au comptoir dès réception des articles sur commande",
     itemsNote: "Toutes les pièces sont neuves & certifiées OEM",
-    // Textes affichés sous chaque mode de livraison. Les titres et les prix viennent
-    // de WooCommerce : "match" est comparé au type du mode ou à son nom.
+    // Textes affichés sous chaque mode de livraison. Les titres, les prix et les seuils
+    // de gratuité viennent de WooCommerce : "match" est comparé au type du mode ou à son nom.
     shippingModes: [
       {
         match: "local_pickup",
@@ -78,8 +78,6 @@ export const site = {
         match: "Navette",
         text: "Livraison atelier garage ou domicile Marseille métropole",
         note: "Expédition départ quotidien 14h",
-        // Même seuil que "shuttle_free_from" dans scripts/setup-woocommerce.php
-        freeFrom: 80,
       },
       {
         match: "Colissimo",

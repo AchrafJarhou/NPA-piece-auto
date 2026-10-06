@@ -18,6 +18,7 @@ const { takeSnapshot, onFulfilled, onRejected } = createOptimisticHandlers({
     "totals",
     "shipping_rates",
     "needs_shipping",
+    "extensions",
     "nonce",
   ],
   onFulfilledPayload: (_state, payload) => {
@@ -46,6 +47,8 @@ export const cartSlice = createSlice({
     // Modes de livraison proposés par WooCommerce, par colis
     shipping_rates: [],
     needs_shipping: false,
+    // Données ajoutées par mu-plugins/cart.php (seuils de livraison gratuite...)
+    extensions: {},
     // Immatriculation ou VIN pour la vérification de compatibilité, envoyé avec la commande
     vehicleCheck: readVehicleCheck(),
     nonce:

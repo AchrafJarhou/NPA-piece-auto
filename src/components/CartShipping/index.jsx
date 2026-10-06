@@ -16,7 +16,9 @@ const ratePrice = (rate) => Number(rate.price || 0) + Number(rate.taxes || 0);
 // "Mode d'obtention de vos pièces" : les modes et leurs prix viennent de WooCommerce
 export default function CartShipping({ allInStock }) {
   const dispatch = useDispatch();
-  const { shipping_rates: packages, loading } = useSelector((state) => state.cart);
+  const { shipping_rates: packages, extensions, loading } = useSelector((state) => state.cart);
+  // Modes offerts à partir d'un montant, réglés dans WooCommerce (ex. navette dès 80 €)
+  const freeOffers = extensions?.npa?.free_shipping || [];
 
   const choose = async (packageId, rate) => {
     if (rate.selected || loading) return;
@@ -38,6 +40,7 @@ export default function CartShipping({ allInStock }) {
             const texts = findTexts(rate);
             const price = ratePrice(rate);
             const isPickup = rate.method_id === "local_pickup";
+            const freeOffer = price > 0 && freeOffers.find((offer) => offer.title === rate.name);
             const priceLabel =
               price > 0
                 ? formatPrice(price, rate.currency_minor_unit)
@@ -68,9 +71,9 @@ export default function CartShipping({ allInStock }) {
                     <span className="cart-shipping-price">{priceLabel}</span>
                   </span>
                   {texts.text && <span className="cart-shipping-text">{texts.text}</span>}
-                  {price > 0 && texts.freeFrom && (
+                  {freeOffer && (
                     <span className="cart-shipping-text">
-                      Offerte dès {texts.freeFrom} € d'achat
+                      Offerte dès {Number(freeOffer.min_amount).toLocaleString("fr-FR")} € d'achat
                     </span>
                   )}
                   {note && <span className="cart-shipping-note">{note}</span>}
