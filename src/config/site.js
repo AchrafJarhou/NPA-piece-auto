@@ -58,4 +58,45 @@ export const site = {
     storeText:
       "Échange direct avec nos techniciens, vérification pièce sur établi avec vos anciennes pièces si nécessaire. Parking réservé clients.",
   },
+
+  // Textes du panier
+  cart: {
+    storeBanner: "Comptoir Marseille Capelette (13010)",
+    pickupInStock: "Retrait au comptoir dans 2h, articles en stock",
+    pickupOnOrder: "Retrait au comptoir dès réception des articles sur commande",
+    itemsNote: "Toutes les pièces sont neuves & certifiées OEM",
+    // Textes affichés sous chaque mode de livraison. Les titres, les prix et les seuils
+    // de gratuité viennent de WooCommerce : "match" est comparé au type du mode ou à son nom.
+    shippingModes: [
+      {
+        match: "local_pickup",
+        text: "158 Avenue de la Capelette, 13010 Marseille",
+        noteInStock: "Disponible aujourd'hui sous 2h ouvrées",
+        noteOnOrder: "Disponible dès réception des pièces",
+      },
+      {
+        match: "Navette",
+        text: "Livraison atelier garage ou domicile Marseille métropole",
+        note: "Expédition départ quotidien 14h",
+      },
+      {
+        match: "Colissimo",
+        text: "France Métropolitaine avec suivi sécurisé par SMS",
+      },
+    ],
+    guarantees: [
+      "100% Pièces d'Origine Constructeur Garanties",
+      "Paiement chiffré 3D Secure / CB",
+      "30 jours pour changer d'avis & retour magasin gratuit",
+    ],
+    // Suivi du numéro du comptoir (phone ci-dessus)
+    assistance: "Assistance Téléphonique Immédiate :",
+  },
+
+  // Note Google affichée dans le panier (statique pour l'instant)
+  googleRating: {
+    score: "4.8 / 5 sur Google",
+    label: "Avis Clients",
+    text: "+420 garages et particuliers satisfaits",
+  },
 };

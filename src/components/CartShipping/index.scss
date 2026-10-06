@@ -1,0 +1,105 @@
+.cart-shipping {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+  border-radius: var(--radius-md);
+  background-color: var(--white-color);
+  box-shadow: var(--shadow-card);
+}
+
+.cart-shipping-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--dark-color);
+}
+
+.cart-shipping-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cart-shipping-option {
+  display: flex;
+  gap: 10px;
+  padding: 12px;
+  border: 1.5px solid var(--surface-color);
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-color);
+  cursor: pointer;
+  transition: border-color var(--transition);
+
+  &:hover {
+    border-color: var(--surface-color-strong);
+  }
+
+  &.is-selected {
+    border-color: var(--primary-color);
+    background-color: #fff8dc;
+  }
+
+  &:has(.cart-shipping-radio:focus-visible) {
+    outline: 2px solid var(--primary-color-dark);
+  }
+}
+
+// Bouton radio rond de la maquette : contour noir, point noir quand choisi
+.cart-shipping-radio {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin: 2px 0 0;
+  border: 1.5px solid var(--dark-color);
+  border-radius: 50%;
+  background-color: var(--white-color);
+  box-shadow: inset 0 0 0 3px var(--white-color);
+  appearance: none;
+  cursor: pointer;
+
+  &:checked {
+    background-color: var(--dark-color);
+  }
+}
+
+.cart-shipping-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cart-shipping-heading {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 8px;
+}
+
+.cart-shipping-name,
+.cart-shipping-price {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: var(--dark-color);
+}
+
+.cart-shipping-text {
+  font-size: var(--font-size-md);
+  line-height: 1.4;
+  color: var(--text-color-muted);
+}
+
+.cart-shipping-note {
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+  color: var(--text-color);
+}

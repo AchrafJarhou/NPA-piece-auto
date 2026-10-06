@@ -1,4 +1,20 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { logout } from "../slices/userSlice";
+import { isInvalidTokenResponse } from "../utils/authToken";
+
+// Jeton refusé en cours de visite (expiré…) : on déconnecte le client,
+// ce qui recharge un panier invité (cartIdentityListener)
+const logoutIfInvalidToken = async (response, thunkAPI) => {
+  if (response.status !== 403 || !thunkAPI.getState().user.token) return;
+  const data = await response
+    .clone()
+    .json()
+    .catch(() => null);
+  if (isInvalidTokenResponse(data)) {
+    thunkAPI.dispatch(logout());
+    throw new Error("Votre session a expiré, veuillez réessayer.");
+  }
+};
 
 const buildCartHeaders = (thunkAPI, currentNonce) => {
   const token = thunkAPI.getState().user.token;
@@ -22,6 +38,7 @@ export const initializeCartThunk = createAsyncThunk(
           },
         },
       );
+      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible de récupérer le panier initial.");
       }
@@ -51,6 +68,7 @@ export const emptyCartThunk = createAsyncThunk(
         },
       );
 
+      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible de vider le panier.");
       }
@@ -95,6 +113,7 @@ export const addProductToCart = createAsyncThunk(
         },
       );
 
+      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible d'ajouter l'article au panier.");
       }
@@ -127,6 +146,7 @@ export const deleteProductFromCart = createAsyncThunk(
         },
       );
 
+      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible de supprimer l'article du panier.");
       }
@@ -176,6 +196,7 @@ export const substractProductFromCart = createAsyncThunk(
 
       const response = await fetch(url, body);
 
+      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible de modifier l'article.");
       }
@@ -208,13 +229,46 @@ export const applyCouponThunk = createAsyncThunk(
         },
       );
 
+      await logoutIfInvalidToken(response, thunkAPI);
       const cart = await response.json();
-
       if (!response.ok) {
         throw new Error(cart.message || "Ce code promo n'est pas valide.");
       }
 
       const nonce = response.headers.get("Nonce");
+      return { ...cart, nonce };
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
+export const selectShippingRateThunk = createAsyncThunk(
+  "cart/selectShippingRate",
+  async ({ packageId, rateId }, thunkAPI) => {
+    const currentNonce = thunkAPI.getState().cart.nonce;
+
+    try {
+      if (!currentNonce) {
+        throw new Error("Jeton de session manquant.");
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/wp-json/wc/store/v1/cart/select-shipping-rate`,
+        {
+          method: "POST",
+          headers: buildCartHeaders(thunkAPI, currentNonce),
+          body: JSON.stringify({ package_id: packageId, rate_id: rateId }),
+        },
+      );
+
+      await logoutIfInvalidToken(response, thunkAPI);
+      if (!response.ok) {
+        throw new Error("Impossible de choisir ce mode de livraison.");
+      }
+
+      const nonce = response.headers.get("Nonce");
+      const cart = await response.json();
       return { ...cart, nonce };
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
@@ -241,6 +295,7 @@ export const removeCouponThunk = createAsyncThunk(
         },
       );
 
+      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible de retirer ce code promo.");
       }
