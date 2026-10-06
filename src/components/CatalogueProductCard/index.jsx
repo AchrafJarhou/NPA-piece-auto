@@ -14,13 +14,7 @@ function getAvailability(product) {
   if (product.is_on_backorder) {
     return { text: "Sur commande", detail: "Livraison 24/48h", status: "backorder" };
   }
-  if (product.is_in_stock && product.low_stock_remaining) {
-    return {
-      text: `Plus que ${product.low_stock_remaining} en stock`,
-      detail: "Retrait 2h",
-      status: "low",
-    };
-  }
+  // La quantité en stock n'est jamais affichée au client
   if (product.is_in_stock) {
     return {
       text: `En stock magasin ${site.address.city}`,
@@ -95,6 +89,9 @@ export default function CatalogueProductCard({ product }) {
           <img src={image.thumbnail || image.src} alt={image.alt || name} loading="lazy" />
         ) : (
           <span className="catalogue-card-placeholder">Photo à venir</span>
+        )}
+        {!product.is_in_stock && !product.is_on_backorder && (
+          <span className="catalogue-card-out-of-stock">Rupture de stock</span>
         )}
       </Link>
 

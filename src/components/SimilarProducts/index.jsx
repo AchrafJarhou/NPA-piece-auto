@@ -1,9 +1,9 @@
 import "./index.scss";
 import { useEffect, useState } from "react";
-import ProductCard from "../ProductCard";
+import CatalogueProductCard from "../CatalogueProductCard";
 import Loader from "../Loader";
 
-const RECOMMENDED_COUNT = 5;
+const RECOMMENDED_COUNT = 4;
 
 export default function SimilarProducts({
   currentProduct,
@@ -92,14 +92,14 @@ export default function SimilarProducts({
 
   return (
     <section className="similar-products-section">
-      <h2>Produits similaires</h2>
+      <h2 className="similar-products-title">Pièces de la même famille</h2>
 
       {loadingSimilar ? (
         <Loader size="lg" />
       ) : similarProducts.length > 0 ? (
         <div className="similar-products-grid">
           {similarProducts.map((simProduct) => (
-            <ProductCard key={simProduct.id} product={simProduct} />
+            <CatalogueProductCard key={simProduct.id} product={simProduct} />
           ))}
         </div>
       ) : (

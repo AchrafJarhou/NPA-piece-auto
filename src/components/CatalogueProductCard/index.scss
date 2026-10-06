@@ -83,6 +83,7 @@
 }
 
 .catalogue-card-image {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -97,6 +98,22 @@
     object-fit: contain;
     background-color: var(--white-color);
   }
+}
+
+.catalogue-card-out-of-stock {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  background-color: var(--danger-color);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  line-height: 1.5;
+  text-transform: uppercase;
+  color: var(--white-color);
 }
 
 .catalogue-card-placeholder {

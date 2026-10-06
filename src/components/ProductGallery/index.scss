@@ -1,0 +1,201 @@
+@use "../../styles/breakpoints" as *;
+
+.product-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  // Remise à zéro des styles globaux des boutons
+  button {
+    width: auto;
+    padding: 0;
+    border-radius: 0;
+    font: inherit;
+    cursor: pointer;
+  }
+}
+
+.product-gallery-main {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 480px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background-color: var(--white-color);
+  box-shadow: var(--shadow-card);
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+}
+
+.product-gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.product-gallery-placeholder {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: var(--font-size-xs);
+  color: var(--separator-color);
+}
+
+.product-gallery-badges {
+  position: absolute;
+  top: 32px;
+  left: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.product-gallery-badge,
+.product-gallery-stock {
+  padding: 3px 12px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.product-gallery-badge {
+  background-color: var(--white-color);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  color: var(--dark-color);
+
+  &.is-dark {
+    background-color: var(--dark-color);
+    color: var(--white-color);
+  }
+}
+
+.product-gallery-stock {
+  position: absolute;
+  top: 32px;
+  right: 32px;
+
+  &::before {
+    content: "● ";
+  }
+
+  &.is-in-stock {
+    background-color: var(--primary-color);
+    color: var(--dark-color);
+  }
+
+  &.is-backorder {
+    background-color: var(--secondary-color);
+    color: var(--white-color);
+  }
+
+  &.is-out-of-stock {
+    background-color: var(--danger-color);
+    color: var(--white-color);
+  }
+}
+
+.product-gallery .product-gallery-arrow {
+  position: absolute;
+  top: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background-color: rgba(26, 28, 30, 0.75);
+  font-size: 26px;
+  line-height: 1;
+  color: var(--white-color);
+  transform: translateY(-50%);
+
+  &:hover {
+    background-color: var(--dark-color);
+    color: var(--primary-color);
+  }
+
+  &.is-previous {
+    left: 16px;
+  }
+
+  &.is-next {
+    right: 16px;
+  }
+}
+
+.product-gallery-counter {
+  position: absolute;
+  right: 32px;
+  bottom: 32px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background-color: var(--secondary-color);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: var(--white-color);
+}
+
+.product-gallery-thumbnails {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+.product-gallery .product-gallery-thumbnail {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80px;
+  padding: 6px;
+  border: 2px solid transparent;
+  border-radius: var(--radius-md);
+  background-color: var(--white-color);
+  box-shadow: var(--shadow-card);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  &:hover {
+    background-color: var(--white-color);
+    border-color: var(--surface-color-strong);
+  }
+
+  &.is-active {
+    border-color: var(--primary-color);
+  }
+}
+
+@include tablet {
+  .product-gallery-main {
+    height: 340px;
+  }
+
+  .product-gallery-badges,
+  .product-gallery-stock {
+    top: 16px;
+  }
+
+  .product-gallery-badges {
+    left: 16px;
+  }
+
+  .product-gallery-stock {
+    right: 16px;
+  }
+
+  .product-gallery-counter {
+    right: 16px;
+    bottom: 16px;
+  }
+}

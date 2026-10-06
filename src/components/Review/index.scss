@@ -1,88 +1,169 @@
-.review-rating {
+// Tous les styles sont limités à la section des avis (.review-list)
+.review-list {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  gap: 16px;
+
+  p,
+  span,
+  label,
+  strong,
+  a {
+    font-family: var(--font-body);
+    font-size: var(--font-size-md);
+    line-height: 1.5;
+  }
+
   img {
-    width: 4vw;
-    @media screen and (aspect-ratio > 1/1) {
-      width: 1.5vw;
-    }
-    @media screen and (aspect-ratio > 2.6/1) {
-      width: 4lvh;
-    }
+    width: 20px;
+    height: 20px;
   }
 }
 
-.review-list {
-  margin-top: 3.2lvh;
-  img {
-    width: 4vw;
-    @media screen and (aspect-ratio > 1/1) {
-      width: 1.5vw;
-    }
-    @media screen and (aspect-ratio > 2.6/1) {
-      width: 4lvh;
-    }
-  }
+.review-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--dark-color);
 }
-.review-stars {
+
+.review-list .review-info,
+.review-list .review-empty {
+  margin: 0;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-color);
+  color: var(--text-color-muted);
+}
+
+.review-list .review-error {
+  margin: 0;
+  color: var(--danger-color);
+}
+
+/* ---------- Formulaire ---------- */
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-color);
+}
+
+.review-form-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--dark-color);
+}
+
+.review-rating {
   display: flex;
   align-items: center;
+  gap: 4px;
 }
+
 .review-star-button {
   cursor: pointer;
 }
 
-.review-helper-text {
+.review-list .review-helper-text {
+  margin: 4px 0 0;
+  font-size: var(--font-size-sm);
   color: var(--text-color-muted);
-  margin-top: 0.8lvh;
 }
 
 .review-textarea {
   width: 100%;
-  margin-top: 2lvh;
-  padding: 1%;
-  box-sizing: border-box;
+  margin: 0;
+  padding: 12px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background-color: var(--white-color);
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  color: var(--text-color);
 }
-// Style de la pagination
-.pagination {
+
+/* ---------- Liste des avis ---------- */
+.reviews-block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.review-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-color);
+}
+
+.review-stars {
   display: flex;
   align-items: center;
-  margin-top: 5lvh;
-  margin-bottom: 3lvh;
-  width: 100%;
+  gap: 2px;
+}
+
+.review-list .review-meta {
+  strong,
+  span {
+    font-size: var(--font-size-sm);
+    color: var(--text-color-muted);
+  }
+
+  strong {
+    font-weight: 700;
+    color: var(--dark-color);
+  }
+}
+
+.review-content p {
+  margin: 0;
+  color: var(--text-color);
+}
+
+/* ---------- Pagination des avis ---------- */
+.review-pagination {
+  display: flex;
+  flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
+  gap: 6px;
+
   a {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    text-decoration: none;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 10px;
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-color);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    color: var(--dark-color);
 
-    padding: 1vw 1vw;
-    border-radius: 0;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    &.pageChange {
-      padding: 0;
-    }
-    &.inactive {
-      opacity: 0;
-    }
-
-    // Effet au survol de la souris
     &:hover {
-      color: var(--dark-color);
-      transform: translateY(-0.2lvh);
+      background-color: var(--primary-color);
     }
 
-    // Style de la page courante
     &.active {
-      background-color: var(--primary-color);
-      color: var(--bg-color);
+      background-color: var(--dark-color);
+      color: var(--white-color);
       pointer-events: none;
     }
-  }
-}
 
-.reviews-block {
-  margin-top: 3lvh;
+    &.inactive {
+      visibility: hidden;
+    }
+  }
 }
