@@ -10,7 +10,9 @@ import {
   fetchCurrentUserThunk,
   fetchCurrentCustomerThunk,
   fetchCurrentUserOrdersThunk,
+  validateTokenThunk,
 } from "./thunkActionsCreator/userThunks";
+import { logout } from "./slices/userSlice";
 import { fetchSiteThunk } from "./thunkActionsCreator/siteThunk";
 import { fetchWishlistThunk } from "./thunkActionsCreator/wishlistThunks";
 
@@ -39,14 +41,24 @@ import Modal from "./components/Modal";
 import "./index.scss";
 import ScrollToTop from "./components/ScrollToTop";
 
-store.dispatch(initializeCartThunk());
 store.dispatch(fetchSiteThunk());
 
 if (store.getState().user.token) {
-  store.dispatch(fetchCurrentUserThunk());
-  store.dispatch(fetchCurrentCustomerThunk());
-  store.dispatch(fetchCurrentUserOrdersThunk());
-  store.dispatch(fetchWishlistThunk());
+  // On vérifie d'abord le jeton : un jeton refusé ferait échouer tous les appels
+  store.dispatch(validateTokenThunk()).then(({ payload }) => {
+    if (payload?.valid === false) {
+      // La déconnexion recharge un panier invité (cartIdentityListener)
+      store.dispatch(logout());
+      return;
+    }
+    store.dispatch(initializeCartThunk());
+    store.dispatch(fetchCurrentUserThunk());
+    store.dispatch(fetchCurrentCustomerThunk());
+    store.dispatch(fetchCurrentUserOrdersThunk());
+    store.dispatch(fetchWishlistThunk());
+  });
+} else {
+  store.dispatch(initializeCartThunk());
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(

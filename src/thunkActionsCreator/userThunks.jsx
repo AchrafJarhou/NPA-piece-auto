@@ -1,4 +1,27 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { isInvalidTokenResponse } from "../utils/authToken";
+
+// Vérifie le jeton gardé dans le navigateur : s'il n'est plus valide
+// (clé JWT changée, jeton expiré…), on déconnecte le client
+export const validateTokenThunk = createAsyncThunk(
+  "user/validateToken",
+  async (_, thunkAPI) => {
+    try {
+      const token = thunkAPI.getState().user.token;
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/wp-json/jwt-auth/v1/token/validate`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      const data = await response.json();
+      return { valid: !isInvalidTokenResponse(data) };
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
 
 export const loginThunk = createAsyncThunk(
   "user/login",
