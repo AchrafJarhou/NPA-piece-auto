@@ -8,8 +8,10 @@
  *   Windows : C:\wamp64\bin\php\php8.4.0\php.exe scripts/setup-woocommerce.php C:/wamp64/www/wordpress-NPA
  *   Mac     : php scripts/setup-woocommerce.php /Applications/MAMP/htdocs/wordpress-NPA
  *
- * Le script peut être relancé : les zones de livraison créées par lui sont
- * supprimées puis recréées avec les valeurs ci-dessous.
+ * Le script prépare un WordPress neuf (postes de dev, puis une seule fois en production).
+ * ATTENTION : il supprime puis recrée les zones "Marseille & PACA" et "France".
+ * Ne pas le relancer en production une fois que le client a réglé ses tarifs
+ * dans WooCommerce → Réglages → Expédition : ses modifications seraient perdues.
  */
 
 /* ---------- Réglages à adapter ---------- */
@@ -24,7 +26,7 @@ $config = [
     'vat_rate'       => '20.0000',
     'pickup_title'   => 'Retrait comptoir Capelette',
     'shuttle_title'  => 'Navette express 13 / PACA (24h)',
-    // Frais de port TTC (convertis en HT pour WooCommerce, qui y ajoute la TVA)
+    // Frais de port TTC (mu-plugins/cart.php en déduit la TVA)
     'shuttle_cost'   => '9.90', // À CONFIRMER AVEC LE CLIENT : prix de la navette sous le seuil de gratuité
     'shuttle_free_from' => '80', // navette offerte à partir de ce montant (TTC)
     'colissimo_title' => 'Colissimo domicile 48h',
@@ -91,13 +93,6 @@ if (!$hasFrenchRate) {
 
 /* ---------- Zones de livraison ---------- */
 
-// WooCommerce attend des frais de port HT : on convertit le prix TTC du réglage
-function npa_excl_tax($priceInclTax)
-{
-    global $config;
-    return (string) round((float) $priceInclTax / (1 + (float) $config['vat_rate'] / 100), 4);
-}
-
 function npa_add_method($zone, $type, $settings)
 {
     $instanceId = $zone->add_shipping_method($type);
@@ -125,8 +120,8 @@ npa_add_method($paca, 'free_shipping', [
     'requires'   => 'min_amount',
     'min_amount' => $config['shuttle_free_from'],
 ]);
-npa_add_method($paca, 'flat_rate', ['title' => $config['shuttle_title'], 'cost' => npa_excl_tax($config['shuttle_cost'])]);
-npa_add_method($paca, 'flat_rate', ['title' => $config['colissimo_title'], 'cost' => npa_excl_tax($config['colissimo_cost'])]);
+npa_add_method($paca, 'flat_rate', ['title' => $config['shuttle_title'], 'cost' => $config['shuttle_cost']]);
+npa_add_method($paca, 'flat_rate', ['title' => $config['colissimo_title'], 'cost' => $config['colissimo_cost']]);
 
 $france = new WC_Shipping_Zone();
 $france->set_zone_name('France');
@@ -134,7 +129,7 @@ $france->set_zone_order(2);
 $france->add_location($config['store']['country'], 'country');
 $france->save();
 npa_add_method($france, 'local_pickup', ['title' => $config['pickup_title'], 'cost' => '0']);
-npa_add_method($france, 'flat_rate', ['title' => $config['colissimo_title'], 'cost' => npa_excl_tax($config['colissimo_cost'])]);
+npa_add_method($france, 'flat_rate', ['title' => $config['colissimo_title'], 'cost' => $config['colissimo_cost']]);
 
 echo "Zones de livraison créées : Marseille & PACA, France.\n";
 

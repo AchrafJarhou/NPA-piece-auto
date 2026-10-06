@@ -4,6 +4,7 @@
  * Panier (API WooCommerce Store) :
  * - tant que le client n'a pas saisi d'adresse, les frais de port sont calculés
  *   pour le code postal du comptoir (zone Marseille & PACA) ;
+ * - les frais de port saisis dans l'admin sont des prix TTC ;
  * - le retrait comptoir est le mode de livraison choisi par défaut ;
  * - ajoute la marque de chaque article (extensions.npa.brand) ;
  * - ajoute les seuils de livraison gratuite (extensions.npa.free_shipping).
@@ -12,6 +13,34 @@
 // Code postal par défaut : celui de la boutique, tant que le client n'en a pas saisi
 add_filter('woocommerce_customer_get_shipping_postcode', function ($postcode) {
     return $postcode !== '' ? $postcode : get_option('woocommerce_store_postcode', '');
+});
+
+// Frais de port saisis TTC dans l'admin (comme les prix des produits) : WooCommerce les
+// considère HT et ajoute la TVA, on extrait donc la TVA du montant saisi.
+// Ex. Colissimo saisi 7,50 => 6,25 HT + 1,25 TVA, le client paie 7,50 €.
+add_filter('woocommerce_package_rates', function ($rates) {
+    if (!wc_tax_enabled()) {
+        return $rates;
+    }
+    $tax_rates = WC_Tax::get_shipping_tax_rates();
+    foreach ($rates as $rate) {
+        $cost = (float) $rate->get_cost();
+        if ($cost <= 0 || empty($rate->get_taxes())) {
+            continue;
+        }
+        $taxes = WC_Tax::calc_tax($cost, $tax_rates, true);
+        $rate->set_cost($cost - array_sum($taxes));
+        $rate->set_taxes($taxes);
+    }
+    return $rates;
+}, 5);
+
+// Rappel dans l'admin : le coût d'un forfait de livraison se saisit TTC
+add_filter('woocommerce_shipping_instance_form_fields_flat_rate', function ($fields) {
+    if (isset($fields['cost'])) {
+        $fields['cost']['description'] = 'Prix TTC payé par le client (la TVA est déduite automatiquement). ' . ($fields['cost']['description'] ?? '');
+    }
+    return $fields;
 });
 
 // Quand la livraison gratuite est disponible, on masque le même mode en version payante
