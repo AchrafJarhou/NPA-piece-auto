@@ -1,30 +1,61 @@
-.form-container {
+@use "../../styles/breakpoints" as *;
+
+.user-display {
   display: flex;
   flex-direction: column;
-  row-gap: 2vw;
-  @media screen and (aspect-ratio > 2.6/1) {
-    row-gap: 5.2lvh;
+  gap: 16px;
+  padding: var(--gutter);
+  border-radius: var(--radius-md);
+  background-color: var(--white-color);
+  box-shadow: var(--shadow-card);
+}
+
+.user-display__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.user-display__title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--dark-color);
+}
+
+.user-display__type {
+  font-size: var(--font-size-sm);
+  color: var(--text-color-muted);
+}
+
+.user-display__form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+
+  @include mobile {
+    grid-template-columns: 1fr;
   }
-  form {
-    border: solid 1px black;
-    padding: 2vw;
-    @media screen and (aspect-ratio > 2.6/1) {
-      padding: 5.2lvh;
-    }
-    .input-container {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      p {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-        @media screen and (aspect-ratio > 1/1) {
-          justify-content: flex-start;
-          width: auto;
-        }
-      }
-    }
+
+  .btn {
+    justify-self: start;
+    grid-column: 1 / -1;
   }
+}
+
+.user-display__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.user-display__error {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--danger-color);
 }
