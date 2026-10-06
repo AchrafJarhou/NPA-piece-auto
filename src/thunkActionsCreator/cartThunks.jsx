@@ -222,6 +222,38 @@ export const applyCouponThunk = createAsyncThunk(
   },
 );
 
+export const selectShippingRateThunk = createAsyncThunk(
+  "cart/selectShippingRate",
+  async ({ packageId, rateId }, thunkAPI) => {
+    const currentNonce = thunkAPI.getState().cart.nonce;
+
+    try {
+      if (!currentNonce) {
+        throw new Error("Jeton de session manquant.");
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/wp-json/wc/store/v1/cart/select-shipping-rate`,
+        {
+          method: "POST",
+          headers: buildCartHeaders(thunkAPI, currentNonce),
+          body: JSON.stringify({ package_id: packageId, rate_id: rateId }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Impossible de choisir ce mode de livraison.");
+      }
+
+      const nonce = response.headers.get("Nonce");
+      const cart = await response.json();
+      return { ...cart, nonce };
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
 export const removeCouponThunk = createAsyncThunk(
   "cart/removeCoupon",
   async ({ code }, thunkAPI) => {

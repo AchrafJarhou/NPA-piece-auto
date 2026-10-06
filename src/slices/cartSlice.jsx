@@ -7,11 +7,19 @@ import {
   substractProductFromCart,
   applyCouponThunk,
   removeCouponThunk,
+  selectShippingRateThunk,
 } from "../thunkActionsCreator/cartThunks";
 import { createOptimisticHandlers } from "../utils/optimisticFactory";
 
 const { takeSnapshot, onFulfilled, onRejected } = createOptimisticHandlers({
-  keys: ["items", "coupons", "totals", "nonce"],
+  keys: [
+    "items",
+    "coupons",
+    "totals",
+    "shipping_rates",
+    "needs_shipping",
+    "nonce",
+  ],
   onFulfilledPayload: (_state, payload) => {
     if (payload?.nonce) {
       localStorage.setItem("wc_cart_nonce", payload.nonce);
@@ -25,6 +33,9 @@ export const cartSlice = createSlice({
     items: [],
     coupons: [],
     totals: null,
+    // Modes de livraison proposés par WooCommerce, par colis
+    shipping_rates: [],
+    needs_shipping: false,
     nonce:
       typeof window !== "undefined"
         ? localStorage.getItem("wc_cart_nonce")
@@ -112,7 +123,22 @@ export const cartSlice = createSlice({
         state.coupons = state.coupons.filter((c) => c !== code);
       })
       .addCase(removeCouponThunk.fulfilled, onFulfilled)
-      .addCase(removeCouponThunk.rejected, onRejected);
+      .addCase(removeCouponThunk.rejected, onRejected)
+      .addCase(selectShippingRateThunk.pending, (state, action) => {
+        state.loading = true;
+        state.error = null;
+        takeSnapshot(state);
+        // Le mode choisi est coché tout de suite, les totaux arrivent avec la réponse
+        const { packageId, rateId } = action.meta.arg;
+        const pack = state.shipping_rates.find(
+          (p) => p.package_id === packageId,
+        );
+        pack?.shipping_rates.forEach((rate) => {
+          rate.selected = rate.rate_id === rateId;
+        });
+      })
+      .addCase(selectShippingRateThunk.fulfilled, onFulfilled)
+      .addCase(selectShippingRateThunk.rejected, onRejected);
   },
 });
 
