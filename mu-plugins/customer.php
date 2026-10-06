@@ -30,6 +30,8 @@ function headless_get_current_customer($request)
     $customer = new WC_Customer($user_id);
 
     return rest_ensure_response([
+        'accountType'    => get_user_meta($user_id, 'npa_account_type', true) ?: 'particulier',
+        'siret'          => get_user_meta($user_id, 'npa_siret', true) ?: null,
         'billing'        => [
             'firstName' => $customer->get_billing_first_name(),
             'lastName'  => $customer->get_billing_last_name(),
@@ -52,6 +54,7 @@ function headless_get_current_customer($request)
             'state'     => $customer->get_shipping_state(),
             'postcode'  => $customer->get_shipping_postcode(),
             'country'   => $customer->get_shipping_country(),
+            'phone'     => $customer->get_shipping_phone(),
         ],
         'ordersCount'    => function_exists('wc_get_customer_order_count') ? wc_get_customer_order_count($user_id) : null,
         'totalSpent'     => function_exists('wc_get_customer_total_spent') ? wc_get_customer_total_spent($user_id) : null,

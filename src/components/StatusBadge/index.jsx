@@ -1,3 +1,5 @@
+import "./index.scss";
+
 const labels = {
   pending: "En attente de paiement",
   processing: "En préparation",

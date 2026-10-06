@@ -10,6 +10,16 @@ add_action('rest_api_init', function () {
     ]);
 });
 
+// L'API REST (/wp/v2/users/me) enregistre le mot de passe apres wp_slash() :
+// "Mot'passe" devient "Mot\'passe" et la connexion JWT, qui compare le mot de
+// passe tel que saisi, echoue. On le reenregistre donc tel quel.
+add_action('rest_after_insert_user', function ($user, $request, $creating) {
+    $password = $request->get_param('password');
+    if (is_string($password) && $password !== '') {
+        wp_set_password($password, $user->ID);
+    }
+}, 10, 3);
+
 function headless_delete_current_user($request)
 {
     if (!class_exists('WooCommerce')) {
