@@ -1,5 +1,9 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { stripHtml } from "../utils/stripHtml";
 import { isInvalidTokenResponse } from "../utils/authToken";
+
+// Codes renvoyés par le plugin JWT quand l'email ou le mot de passe est faux
+const badCredentialCodes = ["incorrect_password", "invalid_email", "invalid_username"];
 
 // Vérifie le jeton gardé dans le navigateur : s'il n'est plus valide
 // (clé JWT changée, jeton expiré…), on déconnecte le client
@@ -37,7 +41,11 @@ export const loginThunk = createAsyncThunk(
       );
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.message || "Identifiants incorrects.");
+        // Le message de WordPress contient du HTML et un lien vers wp-login
+        if (badCredentialCodes.some((code) => data.code?.includes(code))) {
+          throw new Error("Email ou mot de passe incorrect.");
+        }
+        throw new Error(stripHtml(data.message) || "Identifiants incorrects.");
       }
       thunkAPI.dispatch(fetchCurrentCustomerThunk(data.token));
       thunkAPI.dispatch(fetchCurrentUserOrdersThunk(data.token));
@@ -176,7 +184,10 @@ export const fetchCurrentUserOrdersThunk = createAsyncThunk(
 
 export const registerThunk = createAsyncThunk(
   "user/register",
-  async ({ username, email, password }, thunkAPI) => {
+  async (
+    { username, email, password, firstName, lastName, phone, siret },
+    thunkAPI,
+  ) => {
     try {
       // Endpoint custom a exposer cote WordPress (mu-plugin), au meme titre
       // que le CORS : WordPress ne permet pas la creation de compte anonyme
@@ -187,7 +198,15 @@ export const registerThunk = createAsyncThunk(
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username, email, password }),
+          body: JSON.stringify({
+            username,
+            email,
+            password,
+            firstName,
+            lastName,
+            phone,
+            siret,
+          }),
         },
       );
       const data = await response.json();

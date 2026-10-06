@@ -13,6 +13,8 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const mobilePattern = /^(?:(?:\+|00)33\s?|0)[67](?:[\s.-]?\d{2}){4}$/;
 
 const emptyForm = {
+  firstName: "",
+  lastName: "",
   email: "",
   phone: "",
   isPro: false,
@@ -36,6 +38,8 @@ const validate = (view, form) => {
   }
 
   if (view === "register") {
+    if (!form.firstName.trim()) errors.firstName = "Le prénom est requis.";
+    if (!form.lastName.trim()) errors.lastName = "Le nom est requis.";
     if (form.phone.trim() && !mobilePattern.test(form.phone.trim())) {
       errors.phone = "Entrez un numéro de portable valide (06 ou 07).";
     }
@@ -106,7 +110,7 @@ export default function AuthForm({ view = "login" }) {
     if (Object.keys(validation).length > 0) return;
 
     setSubmitted(true);
-    // TODO backend : "maintenir ma session", téléphone et SIRET à l'inscription
+    // TODO backend : "maintenir ma session"
     if (isLogin) {
       dispatch(
         loginThunk({ username: form.email.trim(), password: form.password }),
@@ -117,6 +121,11 @@ export default function AuthForm({ view = "login" }) {
           username: form.email.trim(),
           email: form.email.trim(),
           password: form.password,
+          firstName: form.firstName.trim(),
+          lastName: form.lastName.trim(),
+          phone: form.phone.trim() || undefined,
+          // Le SIRET permet au back-end de pré-remplir les adresses du pro
+          siret: form.isPro ? form.siret.replace(/\s/g, "") : undefined,
         }),
       );
     }
@@ -142,6 +151,34 @@ export default function AuthForm({ view = "login" }) {
 
   return (
     <form className="auth-form" onSubmit={handleSubmit} noValidate>
+      {!isLogin && (
+        <div className="auth-form-row">
+          <div className="auth-form-field">
+            <label htmlFor="auth-firstName" className="auth-form-label">
+              Prénom
+            </label>
+            <input
+              {...fieldProps("firstName")}
+              type="text"
+              autoComplete="given-name"
+              autoFocus
+            />
+            {fieldError("firstName")}
+          </div>
+          <div className="auth-form-field">
+            <label htmlFor="auth-lastName" className="auth-form-label">
+              Nom
+            </label>
+            <input
+              {...fieldProps("lastName")}
+              type="text"
+              autoComplete="family-name"
+            />
+            {fieldError("lastName")}
+          </div>
+        </div>
+      )}
+
       <div className="auth-form-field">
         <label htmlFor="auth-email" className="auth-form-label">
           Email
@@ -151,7 +188,7 @@ export default function AuthForm({ view = "login" }) {
           type="email"
           autoComplete={isLogin ? "username" : "email"}
           placeholder="votre.email@domaine.fr"
-          autoFocus
+          autoFocus={isLogin}
         />
         {fieldError("email")}
       </div>

@@ -1,0 +1,60 @@
+@use "../../styles/breakpoints" as *;
+
+.address-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.address-fields__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &--full {
+    grid-column: 1 / -1;
+  }
+}
+
+.address-fields__label {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-md);
+  font-weight: 700;
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--dark-color);
+}
+
+.address-fields__optional {
+  font-family: var(--font-body);
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text-color-muted);
+}
+
+.address-fields__input {
+  width: 100%;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background-color: var(--surface-color);
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  color: var(--text-color);
+  transition:
+    border-color var(--transition),
+    background-color var(--transition);
+
+  &:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    background-color: var(--white-color);
+  }
+}

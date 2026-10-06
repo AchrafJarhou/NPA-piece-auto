@@ -1,5 +1,5 @@
 import "./index.scss";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { useDispatch, useSelector } from "react-redux";
@@ -11,6 +11,14 @@ import {
   fetchCurrentUserThunk,
 } from "../../thunkActionsCreator/userThunks";
 import { openModal } from "../../slices/modalSlice";
+import AddressFields from "../AddressFields";
+import {
+  addressLines,
+  hasPostalAddress,
+  missingNames,
+  toStoreAddress,
+  withDefaults,
+} from "../../utils/address";
 
 export default function CheckoutForm() {
   const navigate = useNavigate();
@@ -19,41 +27,53 @@ export default function CheckoutForm() {
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const formRef = useRef(null);
 
   const user = useSelector((state) => state.user);
   const cart = useSelector((state) => state.cart);
 
-  const [sameAsBilling, setSameAsBilling] = useState(false);
+  const savedShipping = user?.customer?.shipping;
+  const savedBilling = user?.customer?.billing;
 
-  const [shippingAddress, setShippingAddress] = useState({
-    first_name: user?.customer?.shipping?.firstName || "Jean",
-    last_name: user?.customer?.shipping?.lastName || "Dupont",
-    address_1: user?.customer?.shipping?.address1 || "10 Rue de la Paix",
-    city: user?.customer?.shipping?.city || "Paris",
-    postcode: user?.customer?.shipping?.postcode || "75001",
-    country: user?.customer?.shipping?.country || "FR",
-    email: user?.profile?.email || "jean.dupont@example.com",
-  });
+  // Nom du destinataire : à défaut dans l'adresse, on reprend celui du compte
+  const fromSaved = (address) => {
+    const base = withDefaults(address);
+    return {
+      ...base,
+      firstName: base.firstName || user?.profile?.firstName || "",
+      lastName: base.lastName || user?.profile?.lastName || "",
+    };
+  };
 
-  const [billingAddress, setBillingAddress] = useState({
-    first_name: user?.customer?.billing?.firstName || "Jean",
-    last_name: user?.customer?.billing?.lastName || "Dupont",
-    address_1: user?.customer?.billing?.address1 || "10 Rue de la Paix",
-    city: user?.customer?.billing?.city || "Paris",
-    postcode: user?.customer?.billing?.postcode || "75001",
-    country: user?.customer?.billing?.country || "FR",
-    email: user?.profile?.email || "jean.dupont@example.com",
-  });
+  const [shippingAddress, setShippingAddress] = useState(() => fromSaved(savedShipping));
+  const [billingAddress, setBillingAddress] = useState(() => fromSaved(savedBilling));
+  const [email, setEmail] = useState(user?.profile?.email || "");
+
+  // Adresse déjà connue (profil ou SIRET) : on demande seulement de la confirmer
+  const [editingShipping, setEditingShipping] = useState(!hasPostalAddress(savedShipping));
+  const [editingBilling, setEditingBilling] = useState(!hasPostalAddress(savedBilling));
+  const [sameAsShipping, setSameAsShipping] = useState(!hasPostalAddress(savedBilling));
+
+  // Le client et le profil peuvent arriver après le montage du formulaire
+  useEffect(() => {
+    if (!user?.customer) return;
+    setShippingAddress(fromSaved(savedShipping));
+    setBillingAddress(fromSaved(savedBilling));
+    setEditingShipping(!hasPostalAddress(savedShipping));
+    setEditingBilling(!hasPostalAddress(savedBilling));
+    setSameAsShipping(!hasPostalAddress(savedBilling));
+  }, [user?.customer]);
 
   useEffect(() => {
-    if (sameAsBilling) {
-      setBillingAddress(shippingAddress);
-    }
-  }, [shippingAddress, sameAsBilling]);
+    if (user?.profile?.email) setEmail(user.profile.email);
+  }, [user?.profile?.email]);
+
+  const finalBilling = editingBilling && sameAsShipping ? shippingAddress : billingAddress;
 
   useEffect(() => {
     const handleGuestCheckout = () => {
-      processCheckout();
+      // Hors soumission du formulaire : on déclenche nous-mêmes la validation
+      if (formRef.current?.reportValidity()) processCheckout();
     };
     window.addEventListener("checkoutContinueAsGuest", handleGuestCheckout);
     return () => {
@@ -62,7 +82,7 @@ export default function CheckoutForm() {
         handleGuestCheckout,
       );
     };
-  }, [stripe, elements, loading, billingAddress, shippingAddress]);
+  }, [stripe, elements, loading, finalBilling, shippingAddress, email]);
 
   const processCheckout = async () => {
     if (!stripe || !elements || loading) return;
@@ -75,8 +95,8 @@ export default function CheckoutForm() {
         type: "card",
         card: cardElement,
         billing_details: {
-          name: `${billingAddress?.first_name} ${billingAddress?.last_name}`,
-          email: billingAddress?.email,
+          name: `${finalBilling.firstName} ${finalBilling.lastName}`,
+          email,
         },
       });
 
@@ -104,8 +124,8 @@ export default function CheckoutForm() {
               { key: "wc-stripe-payment-method", value: paymentMethod.id },
               { key: "payment_method", value: paymentMethod.id },
             ],
-            billing_address: billingAddress,
-            shipping_address: shippingAddress,
+            billing_address: { ...toStoreAddress(finalBilling), email },
+            shipping_address: toStoreAddress(shippingAddress),
           }),
         },
       );
@@ -140,181 +160,142 @@ export default function CheckoutForm() {
     processCheckout();
   };
 
-  const handleChangeAddress = (e) => {
-    const { name, value } = e.target;
-    setBillingAddress((prev) => ({ ...prev, [name]: value }));
+  const cancelShippingEdit = () => {
+    setShippingAddress(fromSaved(savedShipping));
+    setEditingShipping(false);
   };
 
-  const handleChangeShippingAddress = (e) => {
-    const { name, value } = e.target;
-    setShippingAddress((prev) => ({ ...prev, [name]: value }));
+  const cancelBillingEdit = () => {
+    setBillingAddress(fromSaved(savedBilling));
+    setEditingBilling(false);
   };
 
-  const handleCheckboxChange = (e) => {
-    const checked = e.target.checked;
-    setSameAsBilling(checked);
-    if (checked) {
-      setBillingAddress(shippingAddress);
-    }
-  };
+  // Récapitulatif d'une adresse enregistrée, avec le nom du destinataire à
+  // compléter s'il manque (adresse d'un pro récupérée depuis son SIRET)
+  const recap = (type, address, setAddress) => (
+    <div className="checkout-form__recap">
+      <address className="checkout-form__recap-lines">
+        {addressLines(address).map((line) => (
+          <span key={line}>{line}</span>
+        ))}
+      </address>
+      {missingNames(address) && (
+        <>
+          <p className="checkout-form__hint">
+            Indiquez le nom de la personne à qui adresser la commande.
+          </p>
+          <AddressFields
+            idPrefix={`checkout-${type}-names`}
+            value={address}
+            onChange={setAddress}
+            only={["firstName", "lastName"]}
+          />
+        </>
+      )}
+    </div>
+  );
 
   return (
     <div className="checkout-form">
-      <form onSubmit={handleSubmit} className="checkout-form__form">
+      <form ref={formRef} onSubmit={handleSubmit} className="checkout-form__form">
         <div className="checkout-form__section">
           <h3>Adresse de livraison</h3>
-          <div className="checkout-form__grid">
-            <label className="checkout-form__field">
-              <span>Prénom</span>
-              <input
-                name="first_name"
-                value={shippingAddress.first_name}
-                onChange={handleChangeShippingAddress}
-                required
+          {editingShipping ? (
+            <>
+              <AddressFields
+                idPrefix="checkout-shipping"
+                value={shippingAddress}
+                onChange={setShippingAddress}
               />
-            </label>
-
-            <label className="checkout-form__field">
-              <span>Nom</span>
-              <input
-                name="last_name"
-                value={shippingAddress.last_name}
-                onChange={handleChangeShippingAddress}
-                required
-              />
-            </label>
-
-            <label className="checkout-form__field checkout-form__field--full">
-              <span>Adresse</span>
-              <input
-                name="address_1"
-                value={shippingAddress.address_1}
-                onChange={handleChangeShippingAddress}
-                required
-              />
-            </label>
-
-            <label className="checkout-form__field">
-              <span>Ville</span>
-              <input
-                name="city"
-                value={shippingAddress.city}
-                onChange={handleChangeShippingAddress}
-                required
-              />
-            </label>
-
-            <label className="checkout-form__field">
-              <span>Code postal</span>
-              <input
-                name="postcode"
-                value={shippingAddress.postcode}
-                onChange={handleChangeShippingAddress}
-                required
-              />
-            </label>
-
-            <label className="checkout-form__field">
-              <span>Pays</span>
-              <input
-                name="country"
-                value={shippingAddress.country}
-                onChange={handleChangeShippingAddress}
-                required
-              />
-            </label>
-          </div>
-
-          <label className="checkout-form__checkbox">
-            <input
-              type="checkbox"
-              id="sameAsBilling"
-              checked={sameAsBilling}
-              onChange={handleCheckboxChange}
-            />
-            <span>Livrer à la même adresse (facturation identique)</span>
-          </label>
+              {hasPostalAddress(savedShipping) && (
+                <button
+                  type="button"
+                  className="checkout-form__link"
+                  onClick={cancelShippingEdit}
+                >
+                  Revenir à mon adresse enregistrée
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <p className="checkout-form__hint">
+                Cette adresse de livraison est-elle correcte ?
+              </p>
+              {recap("shipping", shippingAddress, setShippingAddress)}
+              <button
+                type="button"
+                className="btn btn-light"
+                onClick={() => setEditingShipping(true)}
+              >
+                Changer l'adresse de livraison
+              </button>
+            </>
+          )}
         </div>
 
-        {!sameAsBilling && (
+        <div className="checkout-form__section">
+          <h3>Adresse de facturation</h3>
+          {!editingBilling ? (
+            <>
+              {recap("billing", billingAddress, setBillingAddress)}
+              <button
+                type="button"
+                className="checkout-form__link"
+                onClick={() => setEditingBilling(true)}
+              >
+                Modifier l'adresse de facturation
+              </button>
+            </>
+          ) : (
+            <>
+              <label className="checkout-form__checkbox">
+                <input
+                  type="checkbox"
+                  checked={sameAsShipping}
+                  onChange={(e) => setSameAsShipping(e.target.checked)}
+                />
+                <span>Identique à l'adresse de livraison</span>
+              </label>
+              {!sameAsShipping && (
+                <AddressFields
+                  idPrefix="checkout-billing"
+                  value={billingAddress}
+                  onChange={setBillingAddress}
+                />
+              )}
+              {hasPostalAddress(savedBilling) && (
+                <button
+                  type="button"
+                  className="checkout-form__link"
+                  onClick={cancelBillingEdit}
+                >
+                  Revenir à mon adresse enregistrée
+                </button>
+              )}
+            </>
+          )}
+        </div>
+
+        {!user?.profile?.email && (
           <div className="checkout-form__section">
-            <h3>Adresse de facturation</h3>
-            <div className="checkout-form__grid">
-              <label className="checkout-form__field">
-                <span>Prénom</span>
-                <input
-                  name="first_name"
-                  value={billingAddress.first_name}
-                  onChange={handleChangeAddress}
-                  required
-                />
+            <div className="address-fields__field">
+              <label htmlFor="checkout-email" className="address-fields__label">
+                Email
               </label>
-
-              <label className="checkout-form__field">
-                <span>Nom</span>
-                <input
-                  name="last_name"
-                  value={billingAddress.last_name}
-                  onChange={handleChangeAddress}
-                  required
-                />
-              </label>
-
-              <label className="checkout-form__field checkout-form__field--full">
-                <span>Adresse</span>
-                <input
-                  name="address_1"
-                  value={billingAddress.address_1}
-                  onChange={handleChangeAddress}
-                  required
-                />
-              </label>
-
-              <label className="checkout-form__field">
-                <span>Ville</span>
-                <input
-                  name="city"
-                  value={billingAddress.city}
-                  onChange={handleChangeAddress}
-                  required
-                />
-              </label>
-
-              <label className="checkout-form__field">
-                <span>Code postal</span>
-                <input
-                  name="postcode"
-                  value={billingAddress.postcode}
-                  onChange={handleChangeAddress}
-                  required
-                />
-              </label>
-
-              <label className="checkout-form__field">
-                <span>Pays</span>
-                <input
-                  name="country"
-                  value={billingAddress.country}
-                  onChange={handleChangeAddress}
-                  required
-                />
-              </label>
+              <input
+                id="checkout-email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                className="address-fields__input"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
           </div>
         )}
-
-        <div className="checkout-form__section">
-          <label className="checkout-form__field checkout-form__field--full">
-            <span>Email</span>
-            <input
-              name="email"
-              type="email"
-              value={billingAddress.email}
-              onChange={handleChangeAddress}
-              required
-            />
-          </label>
-        </div>
 
         <div className="checkout-form__section checkout-form__payment">
           <h3>Paiement</h3>
