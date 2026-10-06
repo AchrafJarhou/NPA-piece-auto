@@ -4,7 +4,9 @@
  * Panier (API WooCommerce Store) :
  * - tant que le client n'a pas saisi d'adresse, les frais de port sont calculés
  *   pour le code postal du comptoir (zone Marseille & PACA) ;
- * - ajoute la marque de chaque article (extensions.npa.brand).
+ * - le retrait comptoir est le mode de livraison choisi par défaut ;
+ * - ajoute la marque de chaque article (extensions.npa.brand) ;
+ * - ajoute les seuils de livraison gratuite (extensions.npa.free_shipping).
  */
 
 // Code postal par défaut : celui de la boutique, tant que le client n'en a pas saisi
@@ -29,6 +31,17 @@ add_filter('woocommerce_package_rates', function ($rates) {
     return $rates;
 }, 100);
 
+// Tant que le client n'a pas choisi de mode, on présélectionne le retrait comptoir
+// (WooCommerce choisirait sinon le premier mode payant)
+add_filter('woocommerce_shipping_chosen_method', function ($default, $rates) {
+    foreach ($rates as $rate_id => $rate) {
+        if ($rate->get_method_id() === 'local_pickup') {
+            return $rate_id;
+        }
+    }
+    return $default;
+}, 10, 2);
+
 // Marque de l'article dans les réponses du panier
 add_action('woocommerce_blocks_loaded', function () {
     if (!function_exists('woocommerce_store_api_register_endpoint_data')) {
@@ -51,6 +64,41 @@ add_action('woocommerce_blocks_loaded', function () {
                 'brand' => [
                     'description' => 'Marque du produit',
                     'type'        => 'string',
+                    'readonly'    => true,
+                ],
+            ];
+        },
+        'schema_type'     => ARRAY_A,
+    ]);
+
+    // Seuils de livraison gratuite réglés dans WooCommerce (ex. navette offerte dès 80 €),
+    // pour afficher "Offerte dès…" sous le mode payant du même nom
+    woocommerce_store_api_register_endpoint_data([
+        'endpoint'        => \Automattic\WooCommerce\StoreApi\Schemas\V1\CartSchema::IDENTIFIER,
+        'namespace'       => 'npa',
+        'data_callback'   => function () {
+            $offers = [];
+            if (!WC()->cart) {
+                return ['free_shipping' => $offers];
+            }
+            foreach (WC()->cart->get_shipping_packages() as $package) {
+                $zone = WC_Shipping_Zones::get_zone_matching_package($package);
+                foreach ($zone->get_shipping_methods(true) as $method) {
+                    if ($method->id === 'free_shipping' && in_array($method->requires, ['min_amount', 'either'], true)) {
+                        $offers[] = [
+                            'title'      => $method->get_title(),
+                            'min_amount' => wc_format_decimal($method->min_amount),
+                        ];
+                    }
+                }
+            }
+            return ['free_shipping' => $offers];
+        },
+        'schema_callback' => function () {
+            return [
+                'free_shipping' => [
+                    'description' => 'Modes offerts à partir d\'un montant (titre et montant TTC)',
+                    'type'        => 'array',
                     'readonly'    => true,
                 ],
             ];
