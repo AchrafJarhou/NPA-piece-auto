@@ -27,6 +27,16 @@ const { takeSnapshot, onFulfilled, onRejected } = createOptimisticHandlers({
   },
 });
 
+const VEHICLE_CHECK_KEY = "npa_vehicle_check";
+
+function readVehicleCheck() {
+  try {
+    return localStorage.getItem(VEHICLE_CHECK_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
 export const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -36,6 +46,8 @@ export const cartSlice = createSlice({
     // Modes de livraison proposés par WooCommerce, par colis
     shipping_rates: [],
     needs_shipping: false,
+    // Immatriculation ou VIN pour la vérification de compatibilité, envoyé avec la commande
+    vehicleCheck: readVehicleCheck(),
     nonce:
       typeof window !== "undefined"
         ? localStorage.getItem("wc_cart_nonce")
@@ -44,7 +56,16 @@ export const cartSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    setVehicleCheck: (state, action) => {
+      state.vehicleCheck = action.payload;
+      try {
+        localStorage.setItem(VEHICLE_CHECK_KEY, action.payload);
+      } catch {
+        // stockage indisponible : la valeur reste en mémoire
+      }
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(initializeCartThunk.pending, (state) => {
@@ -143,3 +164,4 @@ export const cartSlice = createSlice({
 });
 
 export const cartActions = cartSlice.actions;
+export const { setVehicleCheck } = cartSlice.actions;
