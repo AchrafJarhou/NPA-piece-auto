@@ -192,5 +192,79 @@ function headless_get_single_product_with_variation_stock($request)
             : new WP_Error('product_fetch_failed', 'Impossible de recuperer le produit.', ['status' => 500]);
     }
 
-    return rest_ensure_response(headless_enrich_variation_stock($store_response->get_data()));
+    $product_data = headless_enrich_variation_stock($store_response->get_data());
+    $product_data = (array) $product_data;
+    $product_data['npa'] = headless_product_details_extra($product_id);
+
+    return rest_ensure_response($product_data);
+}
+
+/**
+ * Informations de la fiche produit absentes de l'API WooCommerce :
+ * véhicules compatibles regroupés, chemin de catégorie, EAN et logo de la marque.
+ * La quantité en stock n'est volontairement pas exposée.
+ */
+function headless_product_details_extra($product_id)
+{
+    $product = wc_get_product($product_id);
+
+    // Véhicules compatibles : Marque > Modèle > [motorisations]
+    $vehicles = [];
+    $terms = wp_get_post_terms($product_id, 'product_vehicle');
+    if (!is_wp_error($terms)) {
+        foreach ($terms as $term) {
+            $chain = array_reverse(get_ancestors($term->term_id, 'product_vehicle', 'taxonomy'));
+            $chain[] = $term->term_id;
+            $names = array_map(function ($id) {
+                return get_term($id, 'product_vehicle')->name;
+            }, $chain);
+            $brand  = $names[0] ?? '';
+            $model  = $names[1] ?? '';
+            $engine = $names[2] ?? '';
+            $key = $brand . '|' . $model;
+            if (!isset($vehicles[$key])) {
+                $vehicles[$key] = ['brand' => $brand, 'model' => $model, 'engines' => []];
+            }
+            if ($engine) {
+                $vehicles[$key]['engines'][] = $engine;
+            }
+        }
+    }
+    $vehicles = array_values($vehicles);
+    usort($vehicles, function ($a, $b) {
+        return strcmp($a['brand'] . $a['model'], $b['brand'] . $b['model']);
+    });
+    foreach ($vehicles as &$vehicle) {
+        sort($vehicle['engines']);
+    }
+    unset($vehicle);
+
+    // Chemin de la catégorie principale pour le fil d'Ariane (parent > enfant)
+    $category_path = [];
+    $category_ids = $product ? $product->get_category_ids() : [];
+    if ($category_ids) {
+        $chain = array_reverse(get_ancestors($category_ids[0], 'product_cat', 'taxonomy'));
+        $chain[] = $category_ids[0];
+        foreach ($chain as $id) {
+            $category = get_term($id, 'product_cat');
+            if ($category && !is_wp_error($category)) {
+                $category_path[] = ['id' => $category->term_id, 'name' => $category->name, 'slug' => $category->slug];
+            }
+        }
+    }
+
+    // Logo de la marque (image de la marque dans Produits > Marques)
+    $brand_logo = null;
+    $brands = taxonomy_exists('product_brand') ? wp_get_post_terms($product_id, 'product_brand') : [];
+    if (!is_wp_error($brands) && $brands) {
+        $thumbnail_id = get_term_meta($brands[0]->term_id, 'thumbnail_id', true);
+        $brand_logo = $thumbnail_id ? wp_get_attachment_image_url($thumbnail_id, 'thumbnail') : null;
+    }
+
+    return [
+        'vehicles'      => $vehicles,
+        'category_path' => $category_path,
+        'gtin'          => $product && method_exists($product, 'get_global_unique_id') ? $product->get_global_unique_id() : '',
+        'brand_logo'    => $brand_logo ?: null,
+    ];
 }

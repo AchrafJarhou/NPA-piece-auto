@@ -1,11 +1,28 @@
 .similar-products-section {
-  .similar-products-grid {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: space-between;
-    .product-card {
-      margin-bottom: 2vw;
-    }
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.similar-products-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: var(--dark-color);
+}
+
+.similar-products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 16px;
+}
+
+.no-similar-text {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--font-size-md);
+  color: var(--text-color-muted);
 }

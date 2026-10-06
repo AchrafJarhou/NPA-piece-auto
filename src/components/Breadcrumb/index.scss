@@ -1,0 +1,42 @@
+.breadcrumb-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.breadcrumb-item {
+  display: flex;
+  gap: 8px;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  list-style: none;
+  color: var(--text-color-muted);
+
+  // Séparateur "/" entre les éléments
+  & + &::before {
+    content: "/";
+  }
+}
+
+.breadcrumb-link,
+.breadcrumb-current {
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.breadcrumb-link {
+  color: var(--text-color-muted);
+
+  &:hover {
+    color: var(--dark-color);
+    text-decoration: underline;
+  }
+}
+
+.breadcrumb-current {
+  font-weight: 600;
+  color: var(--dark-color);
+}

@@ -263,20 +263,20 @@ const Review = ({ productId }) => {
   };
   return (
     <div id="reviews-section" className="review-list">
-      <h2>Avis</h2>
+      <h2 className="review-title">Avis clients</h2>
 
       {/* --- BLOC NOUVEL AVIS --- */}
       <div className="add-review-section">
         {!user ? (
-          <p className="review-info">ℹ️ Connectez-vous pour ajouter un avis.</p>
+          <p className="review-info">Connectez-vous pour ajouter un avis.</p>
         ) : checkingPurchase ? (
           <p className="review-info">Vérification de vos achats...</p>
         ) : hasPurchased ? (
           <form onSubmit={handleSubmitReview} className="review-form">
-            <h3>Rédiger un avis </h3>
+            <h3 className="review-form-title">Rédiger un avis</h3>
 
-            {submitSuccess && <p>Merci ! Votre avis a été publié.</p>}
-            {submitError && <p>{submitError}</p>}
+            {submitSuccess && <p className="review-info">Merci ! Votre avis a été publié.</p>}
+            {submitError && <p className="review-error">{submitError}</p>}
 
             <div>
               <div className="review-rating">
@@ -312,13 +312,13 @@ const Review = ({ productId }) => {
               />
             </div>
 
-            <button type="submit" disabled={submitting}>
+            <button type="submit" className="btn btn-primary" disabled={submitting}>
               {submitting ? "Envoi..." : "Publier l'avis"}
             </button>
           </form>
         ) : (
           <p className="review-info">
-            🔒 Seuls les clients ayant acheté cet article peuvent laisser un
+            Seuls les clients ayant acheté cet article peuvent laisser un
             avis.
           </p>
         )}
@@ -327,7 +327,9 @@ const Review = ({ productId }) => {
       {/* --- LISTE DES AVIS --- */}
       {/* {loading && <Loader size="lg" />} */}
       {error && <p className="review-error">Erreur : {error}</p>}
-      {!loading && !error && reviews.length === 0 && <p>Aucun avis trouvé.</p>}
+      {!loading && !error && reviews.length === 0 && (
+        <p className="review-empty">Aucun avis pour le moment.</p>
+      )}
       <div className="reviews-block">
         {reviews.map((review) => (
           <article key={review.id || review.review_id} className="review-item">
@@ -354,7 +356,7 @@ const Review = ({ productId }) => {
       </div>
       {/* --- BARRE DE PAGINATION --- */}
       {totalPages > 1 && (
-        <div className="pagination">
+        <div className="review-pagination">
           {currentPage > 1 ? (
             <a
               className="pageChange"

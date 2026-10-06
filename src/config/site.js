@@ -41,4 +41,21 @@ export const site = {
     "Retrait comptoir gratuit 2h",
   ],
   topbarHighlight: "Pièces Neuves Garanties Constructeur",
+
+  // Taux de TVA utilisé pour afficher le prix HT sur la fiche produit
+  vatRate: 0.2,
+
+  // Textes de la fiche produit
+  product: {
+    pickupTitle: "En stock immédiat comptoir Capelette",
+    pickupText: "Retrait gratuit sous 1h au 158 Av. de la Capelette, 13010 Marseille.",
+    deliveryTitle: "Livrable demain à Marseille & Bouches-du-Rhône (13)",
+    deliveryText: "Commandez avant 16h30 pour livraison matinale en atelier ou domicile.",
+    helpTitle: "Un doute sur votre montage ?",
+    helpText:
+      "Envoyez votre immatriculation ou carte grise par WhatsApp pour vérification atelier immédiate.",
+    guarantees: ["Retour 14 jours", "Paiement garanti", "Facture pro TVA"],
+    storeText:
+      "Échange direct avec nos techniciens, vérification pièce sur établi avec vos anciennes pièces si nécessaire. Parking réservé clients.",
+  },
 };
