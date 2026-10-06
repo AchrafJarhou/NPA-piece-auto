@@ -140,6 +140,18 @@ $products = [
     ],
 ];
 
+// Photos de galerie ajoutées selon la photo principale du produit (données de test)
+$galleries = [
+    'plaquettes.jpg'     => ['disque-ventile.jpg', 'disque-perce.jpg'],
+    'disque-ventile.jpg' => ['disque-perce.jpg', 'plaquettes.jpg'],
+    'disque-perce.jpg'   => ['disque-ventile.jpg', 'plaquettes.jpg'],
+    'disque-plein.jpg'   => ['disque-ventile.jpg', 'plaquettes.jpg'],
+    'filtre-huile.jpg'   => ['filtre-air.jpg', 'embrayage.jpg'],
+    'filtre-air.jpg'     => ['filtre-huile.jpg', 'embrayage.jpg'],
+    'embrayage.jpg'      => ['filtre-huile.jpg', 'amortisseur.jpg'],
+    'amortisseur.jpg'    => ['disque-ventile.jpg', 'embrayage.jpg'],
+];
+
 /* ---------- Fonctions utilitaires ---------- */
 
 // Retrouve (ou crée) un terme par son nom dans une taxonomie
@@ -252,12 +264,13 @@ function npa_generate_image($product)
 
 // Ajoute une photo de scripts/seed-images aux médias, centrée sur un fond blanc carré
 // (WooCommerce découpe les miniatures en carré : on évite de couper la pièce)
-function npa_import_photo($product)
+function npa_import_photo($product, $photo = null, $suffix = '')
 {
-    $file = __DIR__ . '/seed-images/' . $product['photo'];
+    $photo = $photo ?: $product['photo'];
+    $file = __DIR__ . '/seed-images/' . $photo;
     $source = @imagecreatefromstring((string) @file_get_contents($file));
     if (!$source) {
-        echo "  ! Photo introuvable : {$product['photo']}, image générée à la place\n";
+        echo "  ! Photo introuvable : {$photo}, image générée à la place\n";
         return npa_generate_image($product);
     }
 
@@ -280,7 +293,7 @@ function npa_import_photo($product)
     imagejpeg($square, null, 88);
     $jpeg = ob_get_clean();
 
-    $upload = wp_upload_bits('produit-' . sanitize_title($product['sku']) . '.jpg', null, $jpeg);
+    $upload = wp_upload_bits('produit-' . sanitize_title($product['sku']) . $suffix . '.jpg', null, $jpeg);
     if (!empty($upload['error'])) {
         echo "  ! Image non créée : {$upload['error']}\n";
         return 0;
@@ -377,6 +390,25 @@ foreach ($products as $data) {
             if ($oldImageId) {
                 wp_delete_attachment($oldImageId, true);
             }
+        }
+    }
+
+    // Galerie : 2 photos supplémentaires pour tester la fiche produit
+    $oldGalleryIds = $product->get_gallery_image_ids();
+    $galleryPhotos = $galleries[$data['photo'] ?? ''] ?? [];
+    if ($galleryPhotos && (!$oldGalleryIds || $regenerateImages)) {
+        $galleryIds = [];
+        foreach ($galleryPhotos as $i => $photo) {
+            $galleryId = npa_import_photo($data, $photo, '-galerie-' . ($i + 1));
+            if ($galleryId) {
+                $galleryIds[] = $galleryId;
+            }
+        }
+        $product = wc_get_product($productId);
+        $product->set_gallery_image_ids($galleryIds);
+        $product->save();
+        foreach ($oldGalleryIds as $oldId) {
+            wp_delete_attachment($oldId, true);
         }
     }
 }
