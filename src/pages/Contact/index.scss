@@ -1,8 +1,54 @@
-.contact-page {
+@use "../../styles/breakpoints" as *;
+
+// On annule la marge globale appliquée à <main> dans index.scss
+main.contact-page {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-height: 70vh;
+  margin: 0;
+}
+
+.contact-page-body {
+  flex: 1;
+  background-color: rgba(248, 249, 250, 0.92);
+}
+
+.contact-page-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 24px;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px var(--gutter) 40px;
+}
+
+.contact-page-main {
+  display: flex;
+  flex: 999 1 560px;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+
+  // Le texte WordPress prend toute la largeur de la colonne
+  .page-content {
+    max-width: none;
+    margin: 0;
+    padding: 32px;
+  }
+}
+
+.contact-page-aside {
+  flex: 1 1 340px;
+  min-width: 0;
+}
+
+@include tablet {
+  .contact-page-inner {
+    gap: 16px;
+    padding: 12px 16px 32px;
+  }
+
+  .contact-page-main .page-content {
+    padding: 20px 16px;
+  }
 }

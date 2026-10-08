@@ -1,16 +1,26 @@
-import { useSelector } from "react-redux";
-import PageContent from "../../components/PageContent";
 import "./index.scss";
+import PageContent from "../../components/PageContent";
+import ContactForm from "../../components/ContactForm";
+import ContactInfo from "../../components/ContactInfo";
+import ReassuranceBand from "../../components/ReassuranceBand";
 
 export default function Contact() {
-  const email = useSelector((state) => state.site.store_email);
   return (
     <main className="contact-page">
-      <PageContent slug="contact" />
+      <div className="contact-page-body">
+        <div className="contact-page-inner">
+          <div className="contact-page-main">
+            {/* Texte d'introduction modifiable par le client dans la page WordPress "contact" */}
+            <PageContent slug="contact" />
+            <ContactForm />
+          </div>
+          <div className="contact-page-aside">
+            <ContactInfo />
+          </div>
+        </div>
+      </div>
 
-      <a href={"mailto:" + email}>
-        <button>Envoyer un message</button>
-      </a>
+      <ReassuranceBand />
     </main>
   );
 }
