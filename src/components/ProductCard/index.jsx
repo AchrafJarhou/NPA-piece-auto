@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { Link, redirect } from "react-router-dom";
 import { useState, useEffect } from "react";
 import WishlistButton from "../WishlistButton";
+import { sanitizeHtml } from "../../utils/sanitizeHtml";
 import "./index.scss";
 
 export default function ProductCard({ product }) {
@@ -77,7 +78,7 @@ export default function ProductCard({ product }) {
         />
         <h4
           dangerouslySetInnerHTML={{
-            __html: product.name || "-",
+            __html: sanitizeHtml(product.name) || "-",
             /* __html: truncateWords(product.name) || "-", */
           }}
         />
@@ -94,7 +95,7 @@ export default function ProductCard({ product }) {
             <p className="stock-status-unavailable">Rupture de stock</p>
           )}
           <span>Prix: </span>
-          <span dangerouslySetInnerHTML={{ __html: product.price_html }} />
+          <span dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.price_html) }} />
         </span>
 
         <span>

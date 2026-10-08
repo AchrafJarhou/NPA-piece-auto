@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPageThunk } from "../../thunkActionsCreator/pagesThunks";
 import Loader from "../Loader";
+import { sanitizeHtml } from "../../utils/sanitizeHtml";
 import "./index.scss";
 
 // Contenu d'une page WordPress (mentions légales, CGV...) retrouvée par son slug :
@@ -31,11 +32,11 @@ export default function PageContent({ slug }) {
     <article className="page-content">
       <h1
         className="page-content-title"
-        dangerouslySetInnerHTML={{ __html: page.title?.rendered ?? "" }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.title?.rendered) }}
       />
       <div
         className="page-content-body"
-        dangerouslySetInnerHTML={{ __html: page.content?.rendered ?? "" }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(page.content?.rendered) }}
       />
     </article>
   );

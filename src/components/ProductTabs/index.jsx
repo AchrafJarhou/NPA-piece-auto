@@ -1,6 +1,7 @@
 import "./index.scss";
 import { useState } from "react";
 import { getProductSpecs } from "../../utils/productHelpers";
+import { sanitizeHtml } from "../../utils/sanitizeHtml";
 
 function VehiclesPanel({ vehicles }) {
   const [query, setQuery] = useState("");
@@ -128,7 +129,7 @@ export default function ProductTabs({ product }) {
           // Description rédigée dans l'admin WordPress
           <div
             className="product-tabs-description"
-            dangerouslySetInnerHTML={{ __html: product.description }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(product.description) }}
           />
         )}
       </div>

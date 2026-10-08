@@ -2,6 +2,7 @@ import "./index.scss";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { hideToast } from "../../slices/toastSlice";
+import { sanitizeHtml } from "../../utils/sanitizeHtml";
 
 export default function Toast() {
   const dispatch = useDispatch();
@@ -17,7 +18,7 @@ export default function Toast() {
 
   return (
     <div className="toast">
-      {<p dangerouslySetInnerHTML={{ __html: message }} />}
+      {<p dangerouslySetInnerHTML={{ __html: sanitizeHtml(message) }} />}
     </div>
   );
 }
