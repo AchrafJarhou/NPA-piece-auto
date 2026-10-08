@@ -4,6 +4,8 @@ import { fetchPageThunk } from "../../thunkActionsCreator/pagesThunks";
 import Loader from "../Loader";
 import "./index.scss";
 
+// Contenu d'une page WordPress (mentions légales, CGV...) retrouvée par son slug :
+// le client modifie le texte directement dans l'admin WordPress
 export default function PageContent({ slug }) {
   const page = useSelector((state) => state.pages.items[slug]);
   const loading = useSelector((state) => state.pages.loading);
@@ -14,15 +16,27 @@ export default function PageContent({ slug }) {
     dispatch(fetchPageThunk(slug));
   }, [dispatch, slug]);
 
-  if (!page && error) return <p>{error}</p>;
+  if (!page && error) {
+    return (
+      <article className="page-content">
+        <p className="page-content-message">
+          Cette page n'est pas disponible pour le moment.
+        </p>
+      </article>
+    );
+  }
   if (!page || loading) return <Loader size="lg" />;
 
-  const title = page.title ?? "";
-  const content = page.content ?? "";
   return (
-    <div className="pageContent">
-      <h2 dangerouslySetInnerHTML={{ __html: title.rendered }} />
-      <div dangerouslySetInnerHTML={{ __html: content.rendered }} />
-    </div>
+    <article className="page-content">
+      <h1
+        className="page-content-title"
+        dangerouslySetInnerHTML={{ __html: page.title?.rendered ?? "" }}
+      />
+      <div
+        className="page-content-body"
+        dangerouslySetInnerHTML={{ __html: page.content?.rendered ?? "" }}
+      />
+    </article>
   );
 }
