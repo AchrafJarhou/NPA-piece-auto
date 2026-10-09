@@ -102,14 +102,11 @@ function headless_register_user($request)
         npa_apply_company_address($user_id, $company_address);
     }
 
-    $token_request = new WP_REST_Request('POST', '/jwt-auth/v1/token');
-    $token_request->set_param('username', $username);
-    $token_request->set_param('password', $password);
-    $token_response = rest_do_request($token_request);
-
-    if ($token_response->is_error()) {
+    // Connexion automatique : cookie HttpOnly + code CSRF (voir auth.php)
+    $response = npa_auth_issue($username, $password);
+    if (is_wp_error($response)) {
         return new WP_Error('token_generation_failed', 'Compte cree, mais la connexion automatique a echoue.', ['status' => 500]);
     }
 
-    return rest_ensure_response($token_response->get_data());
+    return $response;
 }
