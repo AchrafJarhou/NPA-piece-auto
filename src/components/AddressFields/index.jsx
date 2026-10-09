@@ -1,15 +1,8 @@
 import "./index.scss";
 
-const countries = [
-  ["FR", "France"],
-  ["BE", "Belgique"],
-  ["LU", "Luxembourg"],
-  ["CH", "Suisse"],
-  ["MC", "Monaco"],
-  ["DE", "Allemagne"],
-  ["ES", "Espagne"],
-  ["IT", "Italie"],
-];
+// Seule la France est proposée : WooCommerce ne livre qu'en France
+// (WooCommerce → Réglages → Général, réglé par scripts/setup-woocommerce.php)
+const countries = [["FR", "France"]];
 
 const fields = [
   { name: "firstName", label: "Prénom", autoComplete: "given-name", required: true },
