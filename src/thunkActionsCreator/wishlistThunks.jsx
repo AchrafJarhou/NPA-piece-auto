@@ -3,17 +3,16 @@ import {
   readGuestWishlist,
   clearGuestWishlistStorage,
 } from "../utils/guestWishlist";
+import { apiFetch } from "../utils/apiFetch";
 
 export const fetchWishlistThunk = createAsyncThunk(
   "wishlist/fetch",
   async (_, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.token;
-      const response = await fetch(
+      const csrf = thunkAPI.getState().user.csrf;
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/wishlist`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { csrf },
       );
       const data = await response.json();
       if (!response.ok) {
@@ -30,14 +29,14 @@ export const addToWishlistThunk = createAsyncThunk(
   "wishlist/add",
   async (product, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.token;
-      const response = await fetch(
+      const csrf = thunkAPI.getState().user.csrf;
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/wishlist`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            ...(csrf && { "X-NPA-CSRF": csrf }),
           },
           body: JSON.stringify({ productId: product.id }),
         },
@@ -61,28 +60,26 @@ export const mergeGuestWishlistThunk = createAsyncThunk(
   "wishlist/mergeGuest",
   async (_, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.token;
+      const csrf = thunkAPI.getState().user.csrf;
       const guestItems = readGuestWishlist();
 
       for (const item of guestItems) {
-        await fetch(
+        await apiFetch(
           `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/wishlist`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
+              ...(csrf && { "X-NPA-CSRF": csrf }),
             },
             body: JSON.stringify({ productId: item.id }),
           },
         );
       }
 
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/wishlist`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
+        { csrf },
       );
       const data = await response.json();
       if (!response.ok) {
@@ -103,14 +100,14 @@ export const removeFromWishlistThunk = createAsyncThunk(
   "wishlist/remove",
   async (productId, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.token;
-      const response = await fetch(
+      const csrf = thunkAPI.getState().user.csrf;
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/wishlist`,
         {
           method: "DELETE",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            ...(csrf && { "X-NPA-CSRF": csrf }),
           },
           body: JSON.stringify({ productId }),
         },

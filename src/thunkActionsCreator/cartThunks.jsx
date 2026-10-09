@@ -1,27 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { logout } from "../slices/userSlice";
-import { isInvalidTokenResponse } from "../utils/authToken";
+import { apiFetch } from "../utils/apiFetch";
 
-// Jeton refusé en cours de visite (expiré…) : on déconnecte le client,
-// ce qui recharge un panier invité (cartIdentityListener)
-const logoutIfInvalidToken = async (response, thunkAPI) => {
-  if (response.status !== 403 || !thunkAPI.getState().user.token) return;
-  const data = await response
-    .clone()
-    .json()
-    .catch(() => null);
-  if (isInvalidTokenResponse(data)) {
-    thunkAPI.dispatch(logout());
-    throw new Error("Votre session a expiré, veuillez réessayer.");
-  }
-};
-
+// Client connecté : le cookie part avec apiFetch, le code CSRF est ajouté ici
 const buildCartHeaders = (thunkAPI, currentNonce) => {
-  const token = thunkAPI.getState().user.token;
+  const csrf = thunkAPI.getState().user.csrf;
   return {
     "Content-Type": "application/json",
     ...(currentNonce && { Nonce: currentNonce }),
-    ...(token && { Authorization: `Bearer ${token}` }),
+    ...(csrf && { "X-NPA-CSRF": csrf }),
   };
 };
 
@@ -29,16 +15,9 @@ export const initializeCartThunk = createAsyncThunk(
   "cart/initialize",
   async (_, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.token;
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/wc/store/v1/cart`,
-        {
-          headers: {
-            ...(token && { Authorization: `Bearer ${token}` }),
-          },
-        },
       );
-      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible de récupérer le panier initial.");
       }
@@ -60,7 +39,7 @@ export const emptyCartThunk = createAsyncThunk(
         throw new Error("Jeton de session manquant.");
       }
 
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/wc/store/v1/cart/items`,
         {
           method: "DELETE",
@@ -68,7 +47,6 @@ export const emptyCartThunk = createAsyncThunk(
         },
       );
 
-      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible de vider le panier.");
       }
@@ -100,7 +78,7 @@ export const addProductToCart = createAsyncThunk(
         }),
       );
 
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/wc/store/v1/cart/add-item`,
         {
           method: "POST",
@@ -113,7 +91,6 @@ export const addProductToCart = createAsyncThunk(
         },
       );
 
-      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible d'ajouter l'article au panier.");
       }
@@ -137,7 +114,7 @@ export const deleteProductFromCart = createAsyncThunk(
         throw new Error("Jeton de session manquant.");
       }
 
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/wc/store/v1/cart/remove-item`,
         {
           method: "POST",
@@ -146,7 +123,6 @@ export const deleteProductFromCart = createAsyncThunk(
         },
       );
 
-      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible de supprimer l'article du panier.");
       }
@@ -194,9 +170,8 @@ export const substractProductFromCart = createAsyncThunk(
         };
       }
 
-      const response = await fetch(url, body);
+      const response = await apiFetch(url, body);
 
-      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible de modifier l'article.");
       }
@@ -220,7 +195,7 @@ export const applyCouponThunk = createAsyncThunk(
         throw new Error("Jeton de session manquant.");
       }
 
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/wc/store/v1/cart/apply-coupon`,
         {
           method: "POST",
@@ -229,7 +204,6 @@ export const applyCouponThunk = createAsyncThunk(
         },
       );
 
-      await logoutIfInvalidToken(response, thunkAPI);
       const cart = await response.json();
       if (!response.ok) {
         throw new Error(cart.message || "Ce code promo n'est pas valide.");
@@ -253,7 +227,7 @@ export const selectShippingRateThunk = createAsyncThunk(
         throw new Error("Jeton de session manquant.");
       }
 
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/wc/store/v1/cart/select-shipping-rate`,
         {
           method: "POST",
@@ -262,7 +236,6 @@ export const selectShippingRateThunk = createAsyncThunk(
         },
       );
 
-      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible de choisir ce mode de livraison.");
       }
@@ -286,7 +259,7 @@ export const removeCouponThunk = createAsyncThunk(
         throw new Error("Jeton de session manquant.");
       }
 
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/wc/store/v1/cart/remove-coupon`,
         {
           method: "POST",
@@ -295,7 +268,6 @@ export const removeCouponThunk = createAsyncThunk(
         },
       );
 
-      await logoutIfInvalidToken(response, thunkAPI);
       if (!response.ok) {
         throw new Error("Impossible de retirer ce code promo.");
       }

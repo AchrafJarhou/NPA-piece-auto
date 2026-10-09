@@ -5,12 +5,14 @@ import "./index.scss";
 import active from "./review-active.svg";
 import inactive from "./review-inactive.svg";
 import { sanitizeHtml } from "../../utils/sanitizeHtml";
+import { apiFetch } from "../../utils/apiFetch";
 
 const Review = ({ productId }) => {
   const userState = useSelector((state) => state.user || {});
 
   const user = userState.profile || userState.customer || null;
-  const token = userState.token || localStorage.getItem("wc_user_token");
+  const token = userState.isAuthenticated;
+  const csrf = userState.csrf;
   const userOrders = useSelector((state) => state.user?.orders ?? []);
 
   // États pour les avis
@@ -123,13 +125,8 @@ const Review = ({ productId }) => {
           }
         }
 
-        const response = await fetch(
+        const response = await apiFetch(
           `${baseUrl}/wp-json/wc/v3/orders?customer=${user?.id}&status=completed`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
         );
 
         if (response.ok) {
@@ -179,14 +176,12 @@ const Review = ({ productId }) => {
     setSubmitSuccess(false);
 
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `${baseUrl}/wp-json/wc/v3/products/reviews`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          csrf,
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             product_id: productId,
             review: comment,

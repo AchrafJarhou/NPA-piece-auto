@@ -14,7 +14,7 @@ import inactive from "./favorite-inactive.svg";
 
 export default function WishlistButton({ product }) {
   const dispatch = useDispatch();
-  const token = useSelector((state) => state.user.token);
+  const token = useSelector((state) => state.user.isAuthenticated);
   const isWishlisted = useSelector((state) =>
     state.wishlist.items.some((item) => item.id === product.id),
   );

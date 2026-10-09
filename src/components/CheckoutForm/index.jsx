@@ -11,6 +11,7 @@ import {
   fetchCurrentUserThunk,
 } from "../../thunkActionsCreator/userThunks";
 import { openModal } from "../../slices/modalSlice";
+import { apiFetch } from "../../utils/apiFetch";
 import AddressFields from "../AddressFields";
 import {
   addressLines,
@@ -107,15 +108,14 @@ export default function CheckoutForm() {
     }
 
     try {
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/wc/store/v1/checkout`,
         {
           method: "POST",
-          credentials: "include",
+          csrf: user?.csrf,
           headers: {
             "Content-Type": "application/json",
             Nonce: cart?.nonce || "",
-            ...(user?.token && { Authorization: `Bearer ${user.token}` }),
           },
           body: JSON.stringify({
             payment_method: "stripe",
@@ -154,7 +154,7 @@ export default function CheckoutForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!user?.token) {
+    if (!user?.isAuthenticated) {
       dispatch(openModal({ name: "checkoutAuthPrompt" }));
       return;
     }
