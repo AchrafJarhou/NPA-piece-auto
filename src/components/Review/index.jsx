@@ -10,10 +10,9 @@ import { apiFetch } from "../../utils/apiFetch";
 const Review = ({ productId }) => {
   const userState = useSelector((state) => state.user || {});
 
-  const user = userState.profile || userState.customer || null;
-  const token = userState.isAuthenticated;
+  // Client connecté (cookie) : c'est WordPress qui vérifie l'achat, pas le navigateur
+  const user = userState.isAuthenticated ? userState.profile || {} : null;
   const csrf = userState.csrf;
-  const userOrders = useSelector((state) => state.user?.orders ?? []);
 
   // États pour les avis
   const [reviews, setReviews] = useState([]);
@@ -26,6 +25,7 @@ const Review = ({ productId }) => {
 
   // États pour l'achat et le formulaire
   const [hasPurchased, setHasPurchased] = useState(false);
+  const [alreadyReviewed, setAlreadyReviewed] = useState(false);
   const [checkingPurchase, setCheckingPurchase] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -68,103 +68,35 @@ const Review = ({ productId }) => {
     setCurrentPage(1);
   }, [productId]);
 
-  // Helper pour vérifier si une liste d'articles contient le produit
-  const containsProduct = (lineItems, targetId) => {
-    if (!Array.isArray(lineItems)) return false;
-
-    const target = targetId?.toString();
-
-    return lineItems.some((item) => {
-      if (!item || typeof item !== "object") return false;
-
-      const candidates = [
-        item.product_id,
-        item.variation_id,
-        item.product,
-        item.id,
-        item.name,
-      ]
-        .filter(Boolean)
-        .map((value) => value?.toString());
-
-      return candidates.some(
-        (value) => value === target || value?.includes(target),
-      );
-    });
-  };
-
-  // --- Vérification de l'achat du produit ---
+  // --- Le client peut-il noter ce produit ? (achat vérifié par WordPress, mu-plugins/reviews.php) ---
+  const isLoggedIn = Boolean(user);
   useEffect(() => {
-    if (!user || !productId) {
+    if (!isLoggedIn || !productId) {
       setHasPurchased(false);
+      setAlreadyReviewed(false);
       return;
     }
 
-    const checkPurchase = async () => {
-      setCheckingPurchase(true);
-      try {
-        if (Array.isArray(userOrders) && userOrders.length > 0) {
-          const purchased = userOrders.some((order) => {
-            const status = order?.status?.toLowerCase?.() || "";
-            const isCompleted = ["completed", "processing", "paid"].includes(
-              status,
-            );
-            const hasProduct = [
-              order?.line_items,
-              order?.items,
-              order?.products,
-            ].some((items) => containsProduct(items, productId));
+    let cancelled = false;
+    setCheckingPurchase(true);
+    apiFetch(`${baseUrl}/wp-json/custom/v1/reviews/eligibility?product_id=${productId}`)
+      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then((data) => {
+        if (cancelled) return;
+        setHasPurchased(Boolean(data.bought));
+        setAlreadyReviewed(Boolean(data.already_reviewed));
+      })
+      .catch(() => {
+        if (!cancelled) setHasPurchased(false);
+      })
+      .finally(() => {
+        if (!cancelled) setCheckingPurchase(false);
+      });
 
-            return isCompleted && hasProduct;
-          });
-
-          if (purchased) {
-            setHasPurchased(true);
-            setCheckingPurchase(false);
-            return;
-          }
-        }
-
-        const response = await apiFetch(
-          `${baseUrl}/wp-json/wc/v3/orders?customer=${user?.id}&status=completed`,
-        );
-
-        if (response.ok) {
-          const orders = await response.json();
-          const purchased = orders.some((order) => {
-            const status = order?.status?.toLowerCase?.() || "";
-            const isCompleted = ["completed", "processing", "paid"].includes(
-              status,
-            );
-            const hasProduct = [
-              order?.line_items,
-              order?.items,
-              order?.products,
-            ].some((items) => containsProduct(items, productId));
-
-            return isCompleted && hasProduct;
-          });
-          setHasPurchased(purchased);
-        } else {
-          console.error(
-            `❌ [Review] Erreur API Orders (${response.status}) :`,
-            await response.text(),
-          );
-          setHasPurchased(false);
-        }
-      } catch (err) {
-        console.error(
-          "❌ [Review] Erreur lors de la vérification de l'achat :",
-          err,
-        );
-        setHasPurchased(false);
-      } finally {
-        setCheckingPurchase(false);
-      }
+    return () => {
+      cancelled = true;
     };
-
-    checkPurchase();
-  }, [user, productId, userOrders, token, baseUrl]);
+  }, [isLoggedIn, productId, baseUrl]);
 
   // --- Soumission d'un avis ---
   const handleSubmitReview = async (e) => {
@@ -176,31 +108,28 @@ const Review = ({ productId }) => {
     setSubmitSuccess(false);
 
     try {
-      const response = await apiFetch(
-        `${baseUrl}/wp-json/wc/v3/products/reviews`,
-        {
-          method: "POST",
-          csrf,
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            product_id: productId,
-            review: comment,
-            reviewer: user?.username,
-            reviewer_email: user?.email,
-            rating: rating,
-          }),
-        },
-      );
+      // Le nom et l'e-mail sont ceux du compte, ajoutés par WordPress
+      const response = await apiFetch(`${baseUrl}/wp-json/custom/v1/reviews`, {
+        method: "POST",
+        csrf,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          product_id: productId,
+          review: comment,
+          rating: rating,
+        }),
+      });
 
       if (!response.ok) {
         const errData = await response.json();
         throw new Error(errData.message || "Erreur lors de l'envoi de l'avis");
       }
 
+      // L'avis est en attente de validation par le comptoir : il n'apparaît pas encore
       setSubmitSuccess(true);
+      setAlreadyReviewed(true);
       setComment("");
       setRating(0);
-      fetchReviews();
     } catch (err) {
       setSubmitError(err.message || "Erreur lors de la publication.");
     } finally {
@@ -267,11 +196,19 @@ const Review = ({ productId }) => {
           <p className="review-info">Connectez-vous pour ajouter un avis.</p>
         ) : checkingPurchase ? (
           <p className="review-info">Vérification de vos achats...</p>
+        ) : submitSuccess ? (
+          <p className="review-info">
+            Merci ! Votre avis sera publié après validation par notre comptoir.
+          </p>
+        ) : alreadyReviewed ? (
+          <p className="review-info">
+            Vous avez déjà donné votre avis sur ce produit. Il apparaît après validation par
+            notre comptoir.
+          </p>
         ) : hasPurchased ? (
           <form onSubmit={handleSubmitReview} className="review-form">
             <h3 className="review-form-title">Rédiger un avis</h3>
 
-            {submitSuccess && <p className="review-info">Merci ! Votre avis a été publié.</p>}
             {submitError && <p className="review-error">{submitError}</p>}
 
             <div>
