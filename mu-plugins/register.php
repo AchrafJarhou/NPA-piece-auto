@@ -80,6 +80,7 @@ function headless_register_user($request)
         'first_name'   => $first_name,
         'last_name'    => $last_name,
         'display_name' => trim("$first_name $last_name"),
+        'role'         => 'customer', // rôle "Client" de WooCommerce (wp_create_user donne "Abonné")
     ]);
 
     // Le nom sert aussi de destinataire par defaut pour les commandes
@@ -100,6 +101,17 @@ function headless_register_user($request)
         update_user_meta($user_id, 'npa_siret', $siret);
         // API injoignable ($company_address null) : le pro completera son profil
         npa_apply_company_address($user_id, $company_address);
+    }
+
+    // E-mail de bienvenue de WooCommerce ("Nouveau compte", modifiable dans
+    // WooCommerce → Réglages → E-mails). Le mot de passe n'y figure jamais.
+    if (function_exists('WC')) {
+        WC()->mailer();
+        do_action('woocommerce_created_customer', $user_id, [
+            'user_login' => $username,
+            'user_email' => $email,
+            'role'       => 'customer',
+        ], false);
     }
 
     // Connexion automatique : cookie HttpOnly + code CSRF (voir auth.php)
