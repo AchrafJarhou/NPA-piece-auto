@@ -93,6 +93,7 @@ export default function Footer() {
           <Link to="/mentions-legales">Mentions légales</Link>
           <Link to="/cgv">Conditions générales de vente</Link>
           <Link to="/cgu">Conditions générales d'utilisation</Link>
+          <Link to="/contact">Contact</Link>
         </nav>
       </div>
     </>
