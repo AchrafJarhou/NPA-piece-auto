@@ -119,10 +119,12 @@ export default function CheckoutForm() {
           },
           body: JSON.stringify({
             payment_method: "stripe",
+            // WooCommerce transmet uniquement payment_data à l'extension Stripe :
+            // "payment_method" doit valoir "stripe" (type de paiement carte) et
+            // "wc-stripe-payment-method" contient l'identifiant de la carte (pm_...)
             payment_data: [
-              { key: "stripe_source", value: paymentMethod.id },
+              { key: "payment_method", value: "stripe" },
               { key: "wc-stripe-payment-method", value: paymentMethod.id },
-              { key: "payment_method", value: paymentMethod.id },
             ],
             billing_address: { ...toStoreAddress(finalBilling), email },
             shipping_address: toStoreAddress(shippingAddress),
