@@ -1,0 +1,88 @@
+@use "../../styles/breakpoints" as *;
+
+.order-success-hero {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 28px 32px;
+  border-radius: var(--radius-md);
+  background-color: var(--secondary-color);
+  box-shadow: var(--shadow-card);
+}
+
+.order-success-hero-icon {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background-color: var(--primary-color);
+  color: var(--dark-color);
+
+  svg {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+.order-success-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.order-success-hero-eyebrow {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--primary-color);
+}
+
+.order-success-hero-title {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--white-color);
+}
+
+.order-success-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+}
+
+.order-success-hero-date {
+  font-size: var(--font-size-md);
+  color: var(--text-color-subtle);
+}
+
+@include tablet {
+  .order-success-hero {
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 16px;
+  }
+
+  .order-success-hero-icon {
+    width: 48px;
+    height: 48px;
+
+    svg {
+      width: 26px;
+      height: 26px;
+    }
+  }
+
+  .order-success-hero-title {
+    font-size: 28px;
+  }
+}

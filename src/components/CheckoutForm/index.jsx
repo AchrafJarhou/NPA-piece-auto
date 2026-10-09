@@ -142,9 +142,8 @@ export default function CheckoutForm() {
         dispatch(fetchCurrentUserThunk());
         dispatch(fetchCurrentCustomerThunk());
         dispatch(fetchCurrentUserOrdersThunk());
-        user.token &&
-          dispatch(openModal({ name: "orderDetails", props: data.order_id }));
-        navigate(`/success/${data.order_id}`);
+        // La clé de la commande permet d'afficher son récapitulatif, même pour un invité
+        navigate(`/success/${data.order_id}?key=${encodeURIComponent(data.order_key || "")}`);
       }
     } catch (err) {
       setError(err.message);
