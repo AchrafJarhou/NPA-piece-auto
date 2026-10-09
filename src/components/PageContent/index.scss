@@ -1,3 +1,207 @@
-.pageContent {
-  margin: 2vw;
+@use "../../styles/breakpoints" as *;
+
+// Carte blanche qui accueille le contenu d'une page WordPress.
+// Les styles du contenu visent les balises produites par l'éditeur de WordPress
+// (titres, paragraphes, listes, tableaux...) et remplacent les tailles globales en vw.
+.page-content {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 48px;
+  border-radius: var(--radius-md);
+  background-color: var(--white-color);
+  box-shadow: var(--shadow-card);
+}
+
+.page-content-title {
+  margin: 0 0 24px;
+  padding-bottom: 16px;
+  border-bottom: 3px solid var(--primary-color);
+  font-family: var(--font-heading);
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--dark-color);
+}
+
+.page-content-message {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  font-weight: 400;
+  color: var(--text-color-muted);
+}
+
+.page-content-body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  line-height: 1.7;
+  color: var(--text-color);
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  h2,
+  h3,
+  h4 {
+    margin: 32px 0 12px;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    line-height: 1.2;
+    text-transform: uppercase;
+    color: var(--dark-color);
+  }
+
+  h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  h3 {
+    font-size: var(--font-size-lg);
+  }
+
+  h4 {
+    font-size: var(--font-size-base);
+    letter-spacing: 0.6px;
+  }
+
+  p,
+  li,
+  span,
+  td,
+  th,
+  strong,
+  em,
+  a {
+    font-family: var(--font-body);
+    font-size: var(--font-size-base);
+    line-height: 1.7;
+  }
+
+  p {
+    margin: 0 0 14px;
+    font-weight: 400;
+    color: var(--text-color);
+  }
+
+  strong {
+    font-weight: 700;
+    color: var(--dark-color);
+  }
+
+  a {
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    color: var(--primary-color-dark);
+
+    &:hover {
+      color: var(--dark-color);
+    }
+  }
+
+  ul,
+  ol {
+    margin: 0 0 16px;
+    padding-left: 22px;
+  }
+
+  li {
+    margin-bottom: 6px;
+    color: var(--text-color);
+  }
+
+  ul li {
+    list-style: square;
+
+    &::marker {
+      color: var(--primary-color-dark);
+    }
+  }
+
+  ol li {
+    list-style: decimal;
+  }
+
+  // Bloc "Séparateur" de WordPress
+  hr {
+    margin: 32px 0;
+    border: 0;
+    border-top: 1px solid var(--surface-color-strong);
+  }
+
+  // Bloc "Citation" : utile pour mettre en avant une information
+  blockquote {
+    margin: 0 0 16px;
+    padding: 14px 18px;
+    border-left: 4px solid var(--primary-color);
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-color);
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Bloc "Tableau"
+  figure {
+    margin: 0 0 16px;
+  }
+
+  .wp-block-table {
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 10px 12px;
+    border: 1px solid var(--surface-color-strong);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background-color: var(--surface-color);
+    font-weight: 700;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+@include tablet {
+  .page-content {
+    padding: 24px 20px;
+  }
+
+  .page-content-title {
+    font-size: 30px;
+  }
+
+  .page-content-body {
+    font-size: var(--font-size-md);
+
+    p,
+    li,
+    span,
+    td,
+    th,
+    strong,
+    em,
+    a {
+      font-size: var(--font-size-md);
+    }
+
+    h2 {
+      font-size: 22px;
+    }
+  }
 }

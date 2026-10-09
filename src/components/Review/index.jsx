@@ -4,6 +4,7 @@ import Loader from "../Loader";
 import "./index.scss";
 import active from "./review-active.svg";
 import inactive from "./review-inactive.svg";
+import { sanitizeHtml } from "../../utils/sanitizeHtml";
 
 const Review = ({ productId }) => {
   const userState = useSelector((state) => state.user || {});
@@ -348,7 +349,7 @@ const Review = ({ productId }) => {
             <div
               className="review-content"
               dangerouslySetInnerHTML={{
-                __html: review.review || "",
+                __html: sanitizeHtml(review.review),
               }}
             />
           </article>

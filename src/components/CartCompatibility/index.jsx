@@ -2,21 +2,8 @@ import "./index.scss";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setVehicleCheck } from "../../slices/cartSlice";
+import { normalizeVehicle } from "../../utils/vehicleCheck";
 import shieldIcon from "../../assets/icons/shield-yellow.svg";
-
-// Plaque au format SIV (AB-123-CD) ou numéro VIN (17 caractères, sans I, O ni Q)
-const PLATE_PATTERN = /^[A-Z]{2}-?\d{3}-?[A-Z]{2}$/;
-const VIN_PATTERN = /^[A-HJ-NPR-Z0-9]{17}$/;
-
-function normalize(value) {
-  const cleaned = value.toUpperCase().replace(/\s+/g, "");
-  if (PLATE_PATTERN.test(cleaned)) {
-    const letters = cleaned.replace(/-/g, "");
-    return `${letters.slice(0, 2)}-${letters.slice(2, 5)}-${letters.slice(5)}`;
-  }
-  if (VIN_PATTERN.test(cleaned)) return cleaned;
-  return null;
-}
 
 // Vérification de compatibilité : l'immatriculation ou le VIN est gardé dans le panier
 // et sera envoyé avec la commande pour le contrôle du technicien
@@ -32,7 +19,7 @@ export default function CartCompatibility() {
       dispatch(setVehicleCheck(""));
       return;
     }
-    const normalized = normalize(value);
+    const normalized = normalizeVehicle(value);
     if (!normalized) {
       setError("Format attendu : immatriculation AB-123-CD ou VIN à 17 caractères.");
       return;

@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { fetchBlogPostBySlugThunk } from "../../thunkActionsCreator/blogThunks";
 import Loader from "../Loader";
 import Seo from "../Seo";
+import { sanitizeHtml } from "../../utils/sanitizeHtml";
 import "./index.scss";
 
 export default function BlogPostComponent() {
@@ -36,7 +37,7 @@ export default function BlogPostComponent() {
         type="article"
       />
 
-      <h2 dangerouslySetInnerHTML={{ __html: singlePost.titleText }} />
+      <h2 dangerouslySetInnerHTML={{ __html: sanitizeHtml(singlePost.titleText) }} />
       <p className="blog-post-date">
         {new Date(singlePost.date).toLocaleDateString("fr-FR", {
           day: "numeric",
@@ -45,7 +46,7 @@ export default function BlogPostComponent() {
         })}
       </p>
 
-      <div dangerouslySetInnerHTML={{ __html: singlePost.contentHtml || "" }} />
+      <div dangerouslySetInnerHTML={{ __html: sanitizeHtml(singlePost.contentHtml) }} />
     </div>
   );
 }

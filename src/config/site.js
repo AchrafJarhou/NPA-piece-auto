@@ -93,6 +93,20 @@ export const site = {
     assistance: "Assistance Téléphonique Immédiate :",
   },
 
+  // Page contact
+  contact: {
+    // Mêmes clés que NPA_CONTACT_SUBJECTS dans mu-plugins/contact.php
+    subjects: [
+      { value: "piece", label: "Question sur une pièce" },
+      { value: "devis", label: "Demande de devis / identification VIN" },
+      { value: "pro", label: "Compte professionnel" },
+      { value: "commande", label: "Suivi de commande" },
+      { value: "autre", label: "Autre demande" },
+    ],
+    successTitle: "Message envoyé",
+    successText: "Merci, notre équipe du comptoir Capelette vous répond au plus vite.",
+  },
+
   // Note Google affichée dans le panier (statique pour l'instant)
   googleRating: {
     score: "4.8 / 5 sur Google",
