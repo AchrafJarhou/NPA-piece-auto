@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Autocomplete from "../Autocomplete";
-import { logout } from "../../slices/userSlice";
+import { logoutThunk } from "../../thunkActionsCreator/userThunks";
 import { openModal } from "../../slices/modalSlice";
 import useOpenCategory from "../../hooks/useOpenCategory";
 import { site } from "../../config/site";
@@ -16,7 +16,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const dispatch = useDispatch();
   const openCategory = useOpenCategory();
-  const token = useSelector((state) => state.user.token);
+  const token = useSelector((state) => state.user.isAuthenticated);
   const cartItems = useSelector((state) => state.cart.items);
   const cartTotals = useSelector((state) => state.cart.totals);
   const wishlistItems = useSelector((state) => state.wishlist.items);
@@ -109,7 +109,7 @@ export default function Header() {
               <button
                 type="button"
                 className="header-logout"
-                onClick={() => dispatch(logout())}
+                onClick={() => dispatch(logoutThunk())}
               >
                 Déconnexion
               </button>

@@ -10,12 +10,14 @@ import "./index.scss";
 
 export default function Profile() {
   const navigate = useNavigate();
-  const isAuthentificated = useSelector((state) => state.user?.token);
+  const isAuthentificated = useSelector((state) => state.user.isAuthenticated);
+  const authChecked = useSelector((state) => state.user.authChecked);
   const customer = useSelector((state) => state.user.customer);
 
+  // On attend la réponse de WordPress (session vérifiée) avant de rediriger
   useEffect(() => {
-    !isAuthentificated && navigate("/catalogue", { replace: true });
-  }, [isAuthentificated, navigate]);
+    authChecked && !isAuthentificated && navigate("/catalogue", { replace: true });
+  }, [authChecked, isAuthentificated, navigate]);
 
   if (!isAuthentificated) return null;
 

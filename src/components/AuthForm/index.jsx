@@ -77,7 +77,7 @@ const validate = (view, form) => {
 
 export default function AuthForm({ view = "login" }) {
   const dispatch = useDispatch();
-  const { loading, error, token } = useSelector((state) => state.user);
+  const { loading, error, isAuthenticated: token } = useSelector((state) => state.user);
 
   const [form, setForm] = useState(emptyForm);
   const [errors, setErrors] = useState({});

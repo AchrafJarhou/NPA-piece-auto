@@ -80,6 +80,7 @@ function headless_register_user($request)
         'first_name'   => $first_name,
         'last_name'    => $last_name,
         'display_name' => trim("$first_name $last_name"),
+        'role'         => 'customer', // rôle "Client" de WooCommerce (wp_create_user donne "Abonné")
     ]);
 
     // Le nom sert aussi de destinataire par defaut pour les commandes
@@ -102,14 +103,22 @@ function headless_register_user($request)
         npa_apply_company_address($user_id, $company_address);
     }
 
-    $token_request = new WP_REST_Request('POST', '/jwt-auth/v1/token');
-    $token_request->set_param('username', $username);
-    $token_request->set_param('password', $password);
-    $token_response = rest_do_request($token_request);
+    // E-mail de bienvenue de WooCommerce ("Nouveau compte", modifiable dans
+    // WooCommerce → Réglages → E-mails). Le mot de passe n'y figure jamais.
+    if (function_exists('WC')) {
+        WC()->mailer();
+        do_action('woocommerce_created_customer', $user_id, [
+            'user_login' => $username,
+            'user_email' => $email,
+            'role'       => 'customer',
+        ], false);
+    }
 
-    if ($token_response->is_error()) {
+    // Connexion automatique : cookie HttpOnly + code CSRF (voir auth.php)
+    $response = npa_auth_issue($username, $password);
+    if (is_wp_error($response)) {
         return new WP_Error('token_generation_failed', 'Compte cree, mais la connexion automatique a echoue.', ['status' => 500]);
     }
 
-    return rest_ensure_response($token_response->get_data());
+    return $response;
 }

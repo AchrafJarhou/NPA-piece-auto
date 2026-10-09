@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import SucessMessage from "../../components/SucessMessage";
+import { apiFetch } from "../../utils/apiFetch";
 import "./index.scss";
 
 // 1. Cache externe pour persister entre les rendus
@@ -10,7 +11,7 @@ const ordersCache = {};
 export default function OrderDetails() {
   const modalProps = useSelector((state) => state.modal.modalProps);
   const orderId = typeof modalProps === "object" ? modalProps?.id : modalProps;
-  const token = useSelector((state) => state.user.token);
+  const token = useSelector((state) => state.user.isAuthenticated);
 
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -46,13 +47,9 @@ export default function OrderDetails() {
 
     async function fetchOrder() {
       try {
-        const response = await fetch(
+        // Le cookie de connexion identifie le client (requête en lecture : pas de code CSRF)
+        const response = await apiFetch(
           `${import.meta.env.VITE_API_URL}/wp-json/wc/store/v1/order/${orderId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
         );
         const data = await response.json();
         if (!response.ok) {

@@ -7,12 +7,11 @@ import store from "./store";
 
 import { initializeCartThunk } from "./thunkActionsCreator/cartThunks";
 import {
+  checkSessionThunk,
   fetchCurrentUserThunk,
   fetchCurrentCustomerThunk,
   fetchCurrentUserOrdersThunk,
-  validateTokenThunk,
 } from "./thunkActionsCreator/userThunks";
-import { logout } from "./slices/userSlice";
 import { fetchSiteThunk } from "./thunkActionsCreator/siteThunk";
 import { fetchWishlistThunk } from "./thunkActionsCreator/wishlistThunks";
 
@@ -44,23 +43,23 @@ import ScrollToTop from "./components/ScrollToTop";
 
 store.dispatch(fetchSiteThunk());
 
-if (store.getState().user.token) {
-  // On vérifie d'abord le jeton : un jeton refusé ferait échouer tous les appels
-  store.dispatch(validateTokenThunk()).then(({ payload }) => {
-    if (payload?.valid === false) {
-      // La déconnexion recharge un panier invité (cartIdentityListener)
-      store.dispatch(logout());
-      return;
-    }
-    store.dispatch(initializeCartThunk());
+// Ancien stockage du jeton (avant le cookie HttpOnly) : on le supprime du navigateur
+try {
+  localStorage.removeItem("wc_user_token");
+} catch {
+  // stockage indisponible : rien à nettoyer
+}
+
+// Le cookie de connexion est illisible en JavaScript : on demande à WordPress si le client est connecté
+store.dispatch(checkSessionThunk()).finally(() => {
+  store.dispatch(initializeCartThunk());
+  if (store.getState().user.isAuthenticated) {
     store.dispatch(fetchCurrentUserThunk());
     store.dispatch(fetchCurrentCustomerThunk());
     store.dispatch(fetchCurrentUserOrdersThunk());
     store.dispatch(fetchWishlistThunk());
-  });
-} else {
-  store.dispatch(initializeCartThunk());
-}
+  }
+});
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   // <React.StrictMode>

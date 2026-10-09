@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  checkSessionThunk,
   loginThunk,
   registerThunk,
   fetchCurrentUserThunk,
@@ -16,10 +17,12 @@ export const userSlice = createSlice({
     profile: null,
     customer: null,
     orders: [],
-    token:
-      typeof window !== "undefined"
-        ? localStorage.getItem("wc_user_token")
-        : null,
+    // Le jeton de connexion est dans un cookie HttpOnly (mu-plugins/auth.php) :
+    // le site sait seulement si le client est connecté, et garde le code CSRF en mémoire
+    isAuthenticated: false,
+    csrf: null,
+    // Passe à true quand WordPress a répondu à /auth/me (évite de rediriger trop tôt)
+    authChecked: false,
     loading: false,
     error: null,
   },
@@ -28,21 +31,30 @@ export const userSlice = createSlice({
       state.profile = null;
       state.customer = null;
       state.orders = [];
-      state.token = null;
-      localStorage.removeItem("wc_user_token");
+      state.isAuthenticated = false;
+      state.csrf = null;
     },
   },
   extraReducers: (builder) => {
     builder
+      .addCase(checkSessionThunk.fulfilled, (state, action) => {
+        state.authChecked = true;
+        state.isAuthenticated = Boolean(action.payload.logged_in);
+        state.csrf = action.payload.csrf || null;
+        if (action.payload.profile) state.profile = action.payload.profile;
+      })
+      .addCase(checkSessionThunk.rejected, (state) => {
+        state.authChecked = true;
+      })
       .addCase(loginThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(loginThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.csrf = action.payload.csrf;
         state.profile = action.payload.profile;
-        localStorage.setItem("wc_user_token", action.payload.token);
       })
       .addCase(loginThunk.rejected, (state, action) => {
         state.loading = false;
@@ -54,9 +66,9 @@ export const userSlice = createSlice({
       })
       .addCase(registerThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.csrf = action.payload.csrf;
         state.profile = action.payload.profile;
-        localStorage.setItem("wc_user_token", action.payload.token);
       })
       .addCase(registerThunk.rejected, (state, action) => {
         state.loading = false;
@@ -130,13 +142,12 @@ export const userSlice = createSlice({
       .addCase(deleteCurrentUserThunk.fulfilled, (state) => {
         state.loading = false;
         // Remet tout l'état utilisateur à zéro (déconnexion automatique)
-        state.token = null;
+        state.isAuthenticated = false;
+        state.csrf = null;
         state.profile = null;
         state.customer = null;
         state.orders = [];
         state.error = null;
-
-        localStorage.removeItem("wc_user_token");
       })
       .addCase(deleteCurrentUserThunk.rejected, (state, action) => {
         state.loading = false;

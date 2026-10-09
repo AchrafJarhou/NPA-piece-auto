@@ -1,26 +1,25 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { stripHtml } from "../utils/stripHtml";
-import { isInvalidTokenResponse } from "../utils/authToken";
+import { apiFetch } from "../utils/apiFetch";
 
 // Codes renvoyés par le plugin JWT quand l'email ou le mot de passe est faux
 const badCredentialCodes = ["incorrect_password", "invalid_email", "invalid_username"];
 
-// Vérifie le jeton gardé dans le navigateur : s'il n'est plus valide
-// (clé JWT changée, jeton expiré…), on déconnecte le client
-export const validateTokenThunk = createAsyncThunk(
-  "user/validateToken",
+const csrfOf = (thunkAPI) => thunkAPI.getState().user.csrf;
+
+// Au chargement du site : le cookie de connexion est-il toujours valable ?
+// WordPress répond avec le profil et le code CSRF, ou "non connecté".
+export const checkSessionThunk = createAsyncThunk(
+  "user/checkSession",
   async (_, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.token;
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/wp-json/jwt-auth/v1/token/validate`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        },
+      const response = await apiFetch(
+        `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/auth/me`,
       );
-      const data = await response.json();
-      return { valid: !isInvalidTokenResponse(data) };
+      if (!response.ok) {
+        throw new Error("Impossible de vérifier la session.");
+      }
+      return await response.json();
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -31,10 +30,11 @@ export const loginThunk = createAsyncThunk(
   "user/login",
   async ({ username, password }, thunkAPI) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/wp-json/jwt-auth/v1/token`,
+      const response = await apiFetch(
+        `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/auth/login`,
         {
           method: "POST",
+          csrf: csrfOf(thunkAPI),
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ username, password }),
         },
@@ -47,18 +47,25 @@ export const loginThunk = createAsyncThunk(
         }
         throw new Error(stripHtml(data.message) || "Identifiants incorrects.");
       }
-      thunkAPI.dispatch(fetchCurrentCustomerThunk(data.token));
-      thunkAPI.dispatch(fetchCurrentUserOrdersThunk(data.token));
-      return {
-        token: data.token,
-        profile: {
-          email: data.user_email,
-          displayName: data.user_display_name,
-          nicename: data.user_nicename,
-        },
-      };
+      // Le jeton est dans le cookie HttpOnly : on ne reçoit que le profil et le code CSRF
+      return { profile: data.profile, csrf: data.csrf };
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
+    }
+  },
+);
+
+// Déconnexion : seul WordPress peut effacer le cookie HttpOnly
+export const logoutThunk = createAsyncThunk(
+  "user/logoutRequest",
+  async (_, thunkAPI) => {
+    try {
+      await apiFetch(`${import.meta.env.VITE_API_URL}/wp-json/custom/v1/auth/logout`, {
+        method: "POST",
+        csrf: csrfOf(thunkAPI),
+      });
+    } catch {
+      // Même hors ligne, on déconnecte le client dans le site
     }
   },
 );
@@ -67,12 +74,8 @@ export const fetchCurrentUserThunk = createAsyncThunk(
   "user/fetchCurrentUser",
   async (_, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.token;
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/wp/v2/users/me?context=edit`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
       );
       const data = await response.json();
       if (!response.ok) {
@@ -97,21 +100,18 @@ export const updateCurrentUserThunk = createAsyncThunk(
   "user/updateCurrentUser",
   async ({ email, firstName, lastName, password }, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.token;
       const body = {};
       if (email !== undefined) body.email = email;
       if (firstName !== undefined) body.first_name = firstName;
       if (lastName !== undefined) body.last_name = lastName;
       if (password !== undefined) body.password = password;
 
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/wp/v2/users/me`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          csrf: csrfOf(thunkAPI),
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         },
       );
@@ -136,14 +136,10 @@ export const updateCurrentUserThunk = createAsyncThunk(
 
 export const fetchCurrentCustomerThunk = createAsyncThunk(
   "user/fetchCurrentCustomer",
-  async (tokenArg, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
-      const token = tokenArg || thunkAPI.getState().user.token;
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/customer`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
       );
       const data = await response.json();
       if (!response.ok) {
@@ -160,14 +156,10 @@ export const fetchCurrentCustomerThunk = createAsyncThunk(
 
 export const fetchCurrentUserOrdersThunk = createAsyncThunk(
   "user/fetchCurrentUserOrders",
-  async (tokenArg, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
-      const token = tokenArg || thunkAPI.getState().user.token;
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/orders`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
       );
       const data = await response.json();
       if (!response.ok) {
@@ -189,14 +181,13 @@ export const registerThunk = createAsyncThunk(
     thunkAPI,
   ) => {
     try {
-      // Endpoint custom a exposer cote WordPress (mu-plugin), au meme titre
-      // que le CORS : WordPress ne permet pas la creation de compte anonyme
-      // via son API par defaut. On attend en reponse un token, comme pour le
-      // login, pour eviter un deuxieme aller-retour reseau.
-      const response = await fetch(
+      // Route custom (mu-plugins/register.php) : WordPress ne permet pas la création de
+      // compte anonyme via son API. Le client est connecté directement (cookie HttpOnly).
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/register`,
         {
           method: "POST",
+          csrf: csrfOf(thunkAPI),
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             username,
@@ -213,16 +204,7 @@ export const registerThunk = createAsyncThunk(
       if (!response.ok) {
         throw new Error(data.message || "Impossible de creer le compte.");
       }
-      thunkAPI.dispatch(fetchCurrentCustomerThunk(data.token));
-      thunkAPI.dispatch(fetchCurrentUserOrdersThunk(data.token));
-      return {
-        token: data.token,
-        profile: {
-          email: data.user_email,
-          displayName: data.user_display_name,
-          nicename: data.user_nicename,
-        },
-      };
+      return { profile: data.profile, csrf: data.csrf };
     } catch (error) {
       return thunkAPI.rejectWithValue(error.message);
     }
@@ -233,16 +215,12 @@ export const updateCurrentCustomerThunk = createAsyncThunk(
   "user/updateCurrentCustomer",
   async (customerData, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.token;
-
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/customer`,
         {
           method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          csrf: csrfOf(thunkAPI),
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(customerData),
         },
       );
@@ -268,16 +246,12 @@ export const deleteCurrentUserThunk = createAsyncThunk(
   "user/deleteCurrentUser",
   async ({ password }, thunkAPI) => {
     try {
-      const token = thunkAPI.getState().user.token;
-
-      const response = await fetch(
+      const response = await apiFetch(
         `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/user`,
         {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+          csrf: csrfOf(thunkAPI),
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ password }),
         },
       );

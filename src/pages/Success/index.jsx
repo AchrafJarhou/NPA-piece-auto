@@ -9,6 +9,7 @@ import OrderNextSteps from "../../components/OrderNextSteps";
 import OrderRecap from "../../components/OrderRecap";
 import ReassuranceBand from "../../components/ReassuranceBand";
 import Loader from "../../components/Loader";
+import { apiFetch } from "../../utils/apiFetch";
 
 // Page de confirmation : le récapitulatif est demandé à WordPress avec la clé de la commande
 // (?key=wc_order_...) ou, sans clé, pour le client connecté à qui elle appartient
@@ -16,7 +17,7 @@ export default function Success() {
   const { orderId } = useParams();
   const [searchParams] = useSearchParams();
   const key = searchParams.get("key") || "";
-  const token = useSelector((state) => state.user.token);
+  const token = useSelector((state) => state.user.isAuthenticated);
   const dispatch = useDispatch();
   const [order, setOrder] = useState(null);
   const [status, setStatus] = useState("loading"); // loading | ready | error
@@ -24,9 +25,9 @@ export default function Success() {
   useEffect(() => {
     let cancelled = false;
     setStatus("loading");
-    fetch(
+    // Sans clé, le cookie de connexion permet au client de revoir ses propres commandes
+    apiFetch(
       `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/order-confirmation/${encodeURIComponent(orderId)}?key=${encodeURIComponent(key)}`,
-      { headers: token ? { Authorization: `Bearer ${token}` } : {} },
     )
       .then((response) => (response.ok ? response.json() : Promise.reject()))
       .then((data) => {
