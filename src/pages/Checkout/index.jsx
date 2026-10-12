@@ -15,9 +15,6 @@ export default function Checkout() {
         {items.length === 0 ? (
           <div className="checkout-page-empty">
             <p className="checkout-page-empty-text">Votre panier est vide.</p>
-            <Link to="/catalogue" className="btn btn-primary">
-              Voir le catalogue
-            </Link>
           </div>
         ) : (
           <>

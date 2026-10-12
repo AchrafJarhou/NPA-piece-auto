@@ -4,16 +4,6 @@ import { Link } from "react-router-dom";
 import { site } from "../../config/site";
 import logo from "../../assets/images/logo.png";
 
-const serviceLinks = [
-  { label: "Comptoir réservé Professionnels & Garages", to: "/contact" },
-  { label: "Demande de devis immédiat & identification VIN", to: "/contact" },
-  { label: "Garanties pièces d'origine & Retours SAV", to: "/cgv" },
-  { label: "Conditions d'expédition & Navettes PACA", to: "/cgv" },
-  { label: "Guide identification référence OEM", to: "/blog" },
-];
-
-const paymentMethods = ["CB", "VISA", "MASTERCARD"];
-
 export default function Footer() {
   return (
     <>
@@ -52,35 +42,11 @@ export default function Footer() {
             </div>
           </div>
 
-          <nav className="footer-col" aria-label="Services">
-            <h2 className="footer-title">Services &amp; SAV garanti</h2>
-            {serviceLinks.map((link) => (
-              <Link key={link.label} to={link.to} className="footer-link">
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
           <div className="footer-col">
-            <h2 className="footer-title">Paiements 100% sécurisés</h2>
-            <span className="footer-text">
-              Transactions chiffrées SSL et règlements disponibles directement
-              à notre comptoir Capelette.
-            </span>
-            <div className="footer-payments">
-              {paymentMethods.map((method) => (
-                <span key={method} className="footer-payment">
-                  {method}
-                </span>
-              ))}
-              <span className="footer-payment footer-payment-highlight">
-                Comptoir Espèces/CB
-              </span>
-            </div>
-            <span className="footer-text footer-text-strong">
-              Facturation immédiate avec TVA récupérable pour les entreprises
-              &amp; professionnels de l'automobile.
-            </span>
+            <h2 className="footer-title">Une question ?</h2>
+            <Link to="/contact" className="footer-cta">
+              Contactez-nous
+            </Link>
           </div>
         </div>
       </footer>
@@ -93,7 +59,7 @@ export default function Footer() {
           <Link to="/mentions-legales">Mentions légales</Link>
           <Link to="/cgv">Conditions générales de vente</Link>
           <Link to="/cgu">Conditions générales d'utilisation</Link>
-          <Link to="/contact">Contact</Link>
+          <Link to="/faq">FAQ</Link>
         </nav>
       </div>
     </>
