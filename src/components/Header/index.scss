@@ -5,17 +5,11 @@
   top: 0;
   z-index: 100;
   color: var(--white-color);
-  transition:
-    transform 0.3s ease,
-    background-color 0.3s ease;
+  transition: background-color 0.3s ease;
 
   // Le header devient opaque quand on fait défiler la page
   &.header-scrolled {
     background-color: var(--overlay-strong);
-  }
-
-  &.header-hidden {
-    transform: translateY(-100%);
   }
 
   // Remise à zéro des styles globaux des boutons
@@ -49,7 +43,7 @@
   overflow-x: auto;
   white-space: nowrap;
   scrollbar-width: none;
-  background-color: var(--overlay-medium);
+  background-color: rgba(0, 0, 0, 0.8);
 
   &::-webkit-scrollbar {
     display: none;
@@ -78,7 +72,7 @@
   align-items: center;
   gap: 10px var(--gutter);
   padding: 8px var(--gutter);
-  background-color: var(--overlay-light);
+  background-color: rgba(0, 0, 0, 0.7);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
@@ -216,6 +210,23 @@
   color: var(--text-color-subtle);
 }
 
+// Les textes reprennent la couleur et la taille du lien ou du bouton
+// (sinon la règle globale des span les passe en noir)
+.header-account-text,
+.header-account-caption,
+.header-cart-caption {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+// Icône et légende courte : affichées seulement sur mobile
+.header-account-icon,
+.header-login .header-account-caption {
+  display: none;
+}
+
 /* ---------- Favoris et panier ---------- */
 .header-wishlist {
   position: relative;
@@ -265,6 +276,12 @@
   }
 }
 
+// Caddie et légende : affichés seulement sur mobile
+.header-cart-icon,
+.header-cart-caption {
+  display: none;
+}
+
 .header-cart-count {
   font-size: 11px;
   line-height: 1.2;
@@ -289,7 +306,7 @@
   padding: 0 var(--gutter);
   overflow-x: auto;
   scrollbar-width: none;
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.6);
 
   &::-webkit-scrollbar {
     display: none;
@@ -369,12 +386,90 @@
 }
 
 @include mobile {
-  .header-brand-tagline,
-  .header-account .header-info-label {
+  // Seul le logo reste à gauche
+  .header-brand-text,
+  .header-account .header-info-label,
+  .header-account-text,
+  .header-cart-count,
+  .header-cart-total {
     display: none;
   }
 
   .header-search-button {
     padding: 7px 14px;
+  }
+
+  // Compte et panier : icône avec une légende en dessous
+  .header-login,
+  .header-account-link,
+  .header-cart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .header-account-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .header-account-icon,
+  .header-cart-icon svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .header-login .header-account-caption,
+  .header-account-caption,
+  .header-cart-caption {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    line-height: 1;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  .header-cart {
+    padding: 0;
+    background-color: transparent;
+    color: var(--white-color);
+
+    .header &:hover {
+      background-color: transparent;
+      color: var(--primary-color);
+    }
+  }
+
+  .header-cart-icon {
+    position: relative;
+    display: flex;
+    color: inherit;
+  }
+
+  .header-cart-badge {
+    animation: header-badge-pop 0.3s ease;
+  }
+}
+
+@keyframes header-badge-pop {
+  0% {
+    transform: scale(0.4);
+  }
+  70% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
   }
 }

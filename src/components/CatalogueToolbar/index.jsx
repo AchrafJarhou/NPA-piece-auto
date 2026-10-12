@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { setFilters } from "../../slices/filtersSlice";
 
 const sortOptions = [
-  { value: "menu_order-asc", label: "Pertinence" },
-  { value: "popularity-desc", label: "Meilleures ventes" },
+  // { value: "menu_order-asc", label: "Pertinence" },
+  // { value: "popularity-desc", label: "Meilleures ventes" },
   { value: "date-desc", label: "Nouveautés" },
   { value: "price-asc", label: "Prix croissant" },
   { value: "price-desc", label: "Prix décroissant" },

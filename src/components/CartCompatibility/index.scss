@@ -70,11 +70,14 @@
 }
 
 .cart-compatibility-form {
-  max-width: 340px;
+  display: flex;
+  gap: 8px;
+  max-width: 440px;
 }
 
 .cart-compatibility-input {
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   margin: 0;
   padding: 12px;
   border: 0;
@@ -85,6 +88,10 @@
   &[aria-invalid="true"] {
     outline: 1px solid var(--danger-color);
   }
+}
+
+.cart-compatibility-submit {
+  flex-shrink: 0;
 }
 
 .cart-compatibility-error,

@@ -12,7 +12,11 @@ import WishlistButton from "../WishlistButton";
 // Disponibilité affichée sous la description
 function getAvailability(product) {
   if (product.is_on_backorder) {
-    return { text: "Sur commande", detail: "Livraison 24/48h", status: "backorder" };
+    return {
+      text: "Sur commande",
+      detail: "Livraison 24/48h",
+      status: "backorder",
+    };
   }
   // La quantité en stock n'est jamais affichée au client
   if (product.is_in_stock) {
@@ -80,13 +84,17 @@ export default function CatalogueProductCard({ product }) {
               {badge}
             </span>
           )}
-          <WishlistButton product={product} />
+          {/* <WishlistButton product={product} /> */}
         </div>
       </div>
 
       <Link to={productUrl} className="catalogue-card-image" tabIndex="-1">
         {image ? (
-          <img src={image.thumbnail || image.src} alt={image.alt || name} loading="lazy" />
+          <img
+            src={image.thumbnail || image.src}
+            alt={image.alt || name}
+            loading="lazy"
+          />
         ) : (
           <span className="catalogue-card-placeholder">Photo à venir</span>
         )}
@@ -99,14 +107,18 @@ export default function CatalogueProductCard({ product }) {
         {name}
       </Link>
 
-      {description && <p className="catalogue-card-description">{description}</p>}
+      {description && (
+        <p className="catalogue-card-description">{description}</p>
+      )}
 
       {specs.length > 0 && (
         <dl className="catalogue-card-specs">
           {specs.map((spec) => (
             <div key={spec.id || spec.name} className="catalogue-card-spec">
               <dt>{spec.name} :</dt>
-              <dd>{spec.terms.map((term) => stripHtml(term.name)).join(", ")}</dd>
+              <dd>
+                {spec.terms.map((term) => stripHtml(term.name)).join(", ")}
+              </dd>
             </div>
           ))}
         </dl>
@@ -115,7 +127,9 @@ export default function CatalogueProductCard({ product }) {
       <div className={`catalogue-card-stock is-${availability.status}`}>
         <span className="catalogue-card-stock-text">{availability.text}</span>
         {availability.detail && (
-          <span className="catalogue-card-stock-detail">{availability.detail}</span>
+          <span className="catalogue-card-stock-detail">
+            {availability.detail}
+          </span>
         )}
       </div>
 
@@ -137,7 +151,10 @@ export default function CatalogueProductCard({ product }) {
         </div>
 
         {product.has_options ? (
-          <Link to={productUrl} className="btn btn-primary catalogue-card-choose">
+          <Link
+            to={productUrl}
+            className="btn btn-primary catalogue-card-choose"
+          >
             Choisir
           </Link>
         ) : (
@@ -165,7 +182,9 @@ export default function CatalogueProductCard({ product }) {
               type="button"
               className="catalogue-card-add"
               onClick={addToCart}
-              disabled={!product.is_purchasable || !product.is_in_stock || adding}
+              disabled={
+                !product.is_purchasable || !product.is_in_stock || adding
+              }
               title="Ajouter au panier"
               aria-label={`Ajouter ${name} au panier`}
             >

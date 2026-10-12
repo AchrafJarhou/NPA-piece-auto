@@ -159,6 +159,7 @@ Un mode de livraison qui demande un choix supplémentaire au client (point relai
 | `customer.php`, `user.php` | profil et adresses du client, suppression du compte |
 | `orders.php`, `order-confirmation.php` | commandes du client, récapitulatif de la page de confirmation |
 | `cart.php` | panier : frais estimés pour le 13010, port saisi TTC, retrait présélectionné, marque des articles, seuils de livraison gratuite |
+| `vehicle-check.php` | immatriculation / VIN du panier enregistré sur la commande, affiché dans l'admin et les e-mails |
 | `products.php`, `vehicules.php` | produits filtrés par véhicule, taxonomie « Véhicules » |
 | `reviews.php` | avis : éligibilité (achat vérifié) et dépôt en modération |
 | `wishlist.php` | favoris du client |
