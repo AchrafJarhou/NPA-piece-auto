@@ -30,6 +30,7 @@ import Contact from "./pages/Contact";
 import LegalMentions from "./pages/LegalMentions";
 import CGU from "./pages/CGU";
 import CGV from "./pages/CGV";
+import FAQ from "./pages/FAQ";
 import Error404 from "./pages/Error404";
 
 import Seo from "./components/Seo";
@@ -82,6 +83,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <Route path="/mentions-legales" element={<LegalMentions />} />
           <Route path="/cgu" element={<CGU />} />
           <Route path="/cgv" element={<CGV />} />
+          <Route path="/faq" element={<FAQ />} />
           <Route path="/panier" element={<Cart />} />
           <Route path="/commande" element={<Checkout />} />
           <Route path="*" element={<Error404 />} />
