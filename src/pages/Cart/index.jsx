@@ -35,9 +35,6 @@ export default function Cart() {
               <p className="cart-page-empty-text">
                 Trouvez vos pièces dans le catalogue ou par véhicule.
               </p>
-              <Link to="/catalogue" className="btn btn-primary">
-                Voir le catalogue
-              </Link>
             </div>
           ) : (
             <div className="cart-page-layout">
