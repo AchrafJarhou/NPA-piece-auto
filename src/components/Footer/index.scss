@@ -68,10 +68,6 @@
   color: var(--text-color-subtle);
 }
 
-.footer-text-strong {
-  font-weight: 600;
-}
-
 .footer-contact {
   display: flex;
   flex-direction: column;
@@ -111,34 +107,20 @@
   color: var(--primary-color);
 }
 
-.footer .footer-link {
-  font-size: var(--font-size-md);
-  line-height: 1.5;
-  color: var(--text-color-subtle);
-
-  &:hover {
-    color: var(--primary-color);
-  }
-}
-
-.footer-payments {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.footer-payment {
-  padding: 3px 8px;
+.footer .footer-cta {
+  align-self: flex-start;
+  padding: 10px 20px;
   border-radius: var(--radius-sm);
-  background-color: var(--white-color);
-  font-size: var(--font-size-sm);
+  background-color: var(--primary-color);
   font-weight: 700;
   line-height: 1.5;
   color: var(--dark-color);
-}
+  transition: background-color var(--transition);
 
-.footer-payment-highlight {
-  background-color: var(--primary-color);
+  &:hover {
+    background-color: var(--white-color);
+    color: var(--dark-color);
+  }
 }
 
 /* ---------- Bandeau du bas ---------- */
