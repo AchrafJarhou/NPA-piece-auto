@@ -82,7 +82,7 @@ export default function Header() {
         <div className="header-info header-account">
           <span className="header-account-heading">
             <svg
-              className="header-account-icon"
+              className="header-account-heading-icon"
               viewBox="0 0 24 24"
               aria-hidden="true"
             >
@@ -161,7 +161,7 @@ export default function Header() {
           <span className="header-cart-count">{cartCount} · Mon panier</span>
           <span className="header-cart-total">
             <svg
-              className="header-cart-icon"
+              className="header-cart-total-icon"
               viewBox="0 0 24 24"
               aria-hidden="true"
             >

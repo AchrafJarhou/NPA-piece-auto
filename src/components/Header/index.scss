@@ -87,7 +87,7 @@
   display: block;
   flex-shrink: 0;
   width: auto;
-  height: 40px;
+  height: 56px;
   border-radius: 3px;
 }
 
@@ -127,10 +127,12 @@
     height: auto;
   }
 
-  .autocomplete-input {
+  // .autocomplete en plus : le style du composant Autocomplete est chargé après
+  // celui du header et remettrait son propre padding
+  .autocomplete .autocomplete-input {
     width: 100%;
     margin: 0;
-    padding: 7px 12px;
+    padding: 13px 14px;
     border: 0;
     border-radius: var(--radius-sm);
     background-color: var(--white-color);
@@ -152,11 +154,11 @@
 .header-search-button {
   display: flex;
   align-items: center;
-  padding: 7px 22px;
+  padding: 0 16px;
   border-radius: var(--radius-sm);
   background-color: var(--primary-color);
   font-family: var(--font-heading);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: var(--letter-spacing-wide);
   line-height: 1.5;
@@ -203,7 +205,8 @@
   gap: 6px;
 }
 
-.header-account-icon {
+// Petite icône à côté de « Espace client » (version ordi)
+.header-account-heading-icon {
   width: 14px;
   height: 14px;
   fill: none;
@@ -317,7 +320,8 @@
   color: var(--dark-color);
 }
 
-.header-cart-icon {
+// Caddie à côté du total (version ordi)
+.header-cart-total-icon {
   width: 18px;
   height: 18px;
   fill: none;
@@ -350,6 +354,16 @@
   min-width: 92px;
   padding: 8px 2px 7px;
   text-align: center;
+
+  // Bloc centré quand il y a la place ; sinon il défile depuis la gauche
+  // (justify-content: center couperait le début de la liste)
+  &:first-child {
+    margin-left: auto;
+  }
+
+  &:last-child {
+    margin-right: auto;
+  }
 
   .header &:hover .header-category-label {
     color: var(--primary-color);
@@ -416,15 +430,19 @@
 @include mobile {
   // Seul le logo reste à gauche
   .header-brand-text,
-  .header-account .header-info-label,
+  .header-account-heading,
   .header-account-text,
   .header-cart-count,
   .header-cart-total {
     display: none;
   }
 
+  .header-logo {
+    height: 44px;
+  }
+
   .header-search-button {
-    padding: 7px 14px;
+    padding: 0 12px;
   }
 
   // Compte et panier : icône avec une légende en dessous
