@@ -175,6 +175,54 @@
     max-width: 100%;
     height: auto;
   }
+
+  // Bloc "Détails" : question / réponse dépliable (FAQ)
+  details {
+    margin: 0 0 12px;
+    border: 1px solid var(--surface-color-strong);
+    border-radius: var(--radius-sm);
+    background-color: var(--white-color);
+
+    &[open] {
+      border-color: var(--primary-color);
+    }
+
+    > :not(summary) {
+      margin: 0;
+      padding: 0 18px 16px;
+    }
+  }
+
+  summary {
+    position: relative;
+    padding: 14px 44px 14px 18px;
+    font-family: var(--font-body);
+    font-size: var(--font-size-base);
+    font-weight: 700;
+    line-height: 1.5;
+    color: var(--dark-color);
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::after {
+      content: "+";
+      position: absolute;
+      top: 50%;
+      right: 18px;
+      font-size: 22px;
+      line-height: 1;
+      color: var(--primary-color-dark);
+      transform: translateY(-50%);
+    }
+  }
+
+  details[open] > summary::after {
+    content: "–";
+  }
 }
 
 @include tablet {
