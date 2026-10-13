@@ -199,6 +199,12 @@
   color: var(--white-color);
 }
 
+// « Espace client » et le lien en dessous centrés l'un sur l'autre
+.header-account {
+  align-items: center;
+  text-align: center;
+}
+
 .header-account-heading {
   display: flex;
   align-items: center;
@@ -213,19 +219,6 @@
   stroke: currentColor;
   stroke-width: 2;
   stroke-linecap: round;
-}
-
-.header-account-links {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-}
-
-.header .header-logout {
-  font-family: var(--font-body);
-  font-size: 11px;
-  text-decoration: underline;
-  color: var(--text-color-subtle);
 }
 
 // Les textes reprennent la couleur et la taille du lien ou du bouton
@@ -464,12 +457,6 @@
     flex-direction: column;
     align-items: center;
     gap: 3px;
-  }
-
-  .header-account-links {
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
   }
 
   .header-account-icon,

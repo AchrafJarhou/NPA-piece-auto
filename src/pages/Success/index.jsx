@@ -104,8 +104,8 @@ export default function Success() {
                   )}
 
                   <div className="success-page-actions">
-                    <Link to="/catalogue" className="btn btn-primary">
-                      Poursuivre mes achats
+                    <Link to="/" className="btn btn-primary">
+                      Retour à l'accueil
                     </Link>
                     {token && (
                       <Link to="/profile" className="btn btn-light">

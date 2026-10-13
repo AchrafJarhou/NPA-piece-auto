@@ -41,12 +41,12 @@ export default function Cart() {
           ) : (
             <div className="cart-page-layout">
               <div className="cart-page-main">
-                <CartStoreBanner allInStock={allInStock} />
+                {/* <CartStoreBanner allInStock={allInStock} /> */}
                 <CartItems items={items} />
                 <CartCompatibility />
                 {/* <Coupon /> */}
-                <Link to="/catalogue" className="cart-page-continue">
-                  ← Poursuivre mes achats de pièces
+                <Link to="/" className="cart-page-continue">
+                  ← Retour à l'accueil
                 </Link>
               </div>
 

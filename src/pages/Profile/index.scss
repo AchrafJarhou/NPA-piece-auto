@@ -17,6 +17,51 @@
   }
 }
 
+.profile__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+// Icône de sortie avec la légende en dessous (on neutralise le style bouton global)
+.profile__logout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: auto;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--dark-color);
+
+  svg {
+    width: 28px;
+    height: 28px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  span {
+    font-family: var(--font-heading);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    line-height: 1;
+    text-transform: uppercase;
+    color: inherit;
+  }
+
+  &:hover {
+    background-color: var(--primary-color);
+  }
+}
+
 .profile__title {
   margin: 0;
   font-family: var(--font-heading);
