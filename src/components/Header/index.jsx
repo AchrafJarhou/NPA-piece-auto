@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Autocomplete from "../Autocomplete";
-import { logoutThunk } from "../../thunkActionsCreator/userThunks";
 import { openModal } from "../../slices/modalSlice";
 import useOpenCategory from "../../hooks/useOpenCategory";
 import { site } from "../../config/site";
@@ -92,22 +91,14 @@ export default function Header() {
             <span className="header-info-label">Espace client</span>
           </span>
           {token ? (
-            <span className="header-account-links">
-              <Link
-                to="/profile"
-                className="header-info-value header-account-link"
-              >
-                <UserIcon />
-                <span className="header-account-caption">Mon compte</span>
-              </Link>
-              <button
-                type="button"
-                className="header-logout"
-                onClick={() => dispatch(logoutThunk())}
-              >
-                Déconnexion
-              </button>
-            </span>
+            // La déconnexion se fait depuis la page profil
+            <Link
+              to="/profile"
+              className="header-info-value header-account-link"
+            >
+              <UserIcon />
+              <span className="header-account-caption">Mon compte</span>
+            </Link>
           ) : (
             <button
               type="button"

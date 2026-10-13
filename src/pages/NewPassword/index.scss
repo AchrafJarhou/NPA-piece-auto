@@ -1,0 +1,27 @@
+@use "../../styles/breakpoints" as *;
+
+main.new-password-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 48px 16px;
+}
+
+// Encadré repris de la modale (components/Modal) : fond blanc, liseré jaune en haut
+.new-password-card {
+  padding: 40px;
+  border-top: 6px solid var(--primary-color);
+  border-radius: var(--radius-xl);
+  background-color: var(--white-color);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+@include mobile {
+  main.new-password-page {
+    padding: 24px 16px;
+  }
+
+  .new-password-card {
+    padding: 28px 20px;
+  }
+}
