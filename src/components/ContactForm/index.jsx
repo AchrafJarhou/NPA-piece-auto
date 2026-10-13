@@ -12,21 +12,26 @@ const phonePattern = /^[0-9+\s.\-()]{6,20}$/;
 const validate = (form) => {
   const errors = {};
   if (!form.name.trim()) errors.name = "Indiquez votre nom.";
-  if (!emailPattern.test(form.email.trim())) errors.email = "Entrez une adresse e-mail valide.";
+  if (!emailPattern.test(form.email.trim()))
+    errors.email = "Entrez une adresse e-mail valide.";
   if (form.phone.trim() && !phonePattern.test(form.phone.trim())) {
     errors.phone = "Numéro de téléphone invalide.";
   }
-  if (!site.contact.subjects.some((subject) => subject.value === form.subject)) {
+  if (
+    !site.contact.subjects.some((subject) => subject.value === form.subject)
+  ) {
     errors.subject = "Choisissez un sujet.";
   }
   if (form.vehicle.trim() && !normalizeVehicle(form.vehicle)) {
-    errors.vehicle = "Format attendu : immatriculation AB-123-CD ou VIN à 17 caractères.";
+    errors.vehicle =
+      "Format attendu : immatriculation AB-123-CD ou VIN à 17 caractères.";
   }
   const length = form.message.trim().length;
   if (length < 10 || length > 3000) {
     errors.message = "Votre message doit contenir entre 10 et 3000 caractères.";
   }
-  if (!form.consent) errors.consent = "Merci d'accepter le traitement de vos données.";
+  if (!form.consent)
+    errors.consent = "Merci d'accepter le traitement de vos données.";
   return errors;
 };
 
@@ -42,7 +47,9 @@ export default function ContactForm() {
     name: profile?.displayName || "",
     email: profile?.email || "",
     phone: "",
-    subject: site.contact.subjects.some((s) => s.value === subjectFromUrl) ? subjectFromUrl : "",
+    subject: site.contact.subjects.some((s) => s.value === subjectFromUrl)
+      ? subjectFromUrl
+      : "",
     vehicle: savedVehicle || "",
     message: "",
     consent: false,
@@ -67,14 +74,17 @@ export default function ContactForm() {
     setStatus("sending");
     setServerError("");
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/wp-json/custom/v1/contact`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          vehicle: form.vehicle.trim() ? normalizeVehicle(form.vehicle) : "",
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/wp-json/custom/v1/contact`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...form,
+            vehicle: form.vehicle.trim() ? normalizeVehicle(form.vehicle) : "",
+          }),
+        },
+      );
       const data = await response.json();
       if (!response.ok) {
         if (data.data?.fields) setErrors(data.data.fields);
@@ -83,7 +93,9 @@ export default function ContactForm() {
       setStatus("sent");
     } catch (error) {
       setStatus("idle");
-      setServerError(`${error.message} Vous pouvez aussi nous appeler au ${site.phone}.`);
+      setServerError(
+        `${error.message} Vous pouvez aussi nous appeler au ${site.phone}.`,
+      );
     }
   };
 
@@ -92,8 +104,8 @@ export default function ContactForm() {
       <section className="contact-form contact-form-success" role="status">
         <h2 className="contact-form-title">{site.contact.successTitle}</h2>
         <p className="contact-form-text">{site.contact.successText}</p>
-        <Link to="/catalogue" className="btn btn-primary">
-          Retour au catalogue
+        <Link to="/" className="btn btn-primary">
+          Retour à l'accueil
         </Link>
       </section>
     );
@@ -120,8 +132,9 @@ export default function ContactForm() {
     <section className="contact-form">
       <h2 className="contact-form-title">Écrivez-nous</h2>
       <p className="contact-form-text">
-        Une question sur une pièce, un devis ou votre compte pro : nos techniciens vous
-        répondent. Pour une identification précise, indiquez votre immatriculation ou VIN.
+        Une question sur une pièce, un devis ou votre compte pro : nos
+        techniciens vous répondent. Pour une identification précise, indiquez
+        votre immatriculation ou VIN.
       </p>
 
       <form onSubmit={handleSubmit} noValidate className="contact-form-fields">
@@ -130,7 +143,11 @@ export default function ContactForm() {
             <label htmlFor="contact-name" className="contact-form-label">
               Nom ou garage
             </label>
-            <input {...fieldProps("name")} autoComplete="name" maxLength={100} />
+            <input
+              {...fieldProps("name")}
+              autoComplete="name"
+              maxLength={100}
+            />
             {fieldError("name")}
           </div>
           <div className="contact-form-field">
@@ -145,9 +162,15 @@ export default function ContactForm() {
         <div className="contact-form-row">
           <div className="contact-form-field">
             <label htmlFor="contact-phone" className="contact-form-label">
-              Téléphone <span className="contact-form-optional">(facultatif)</span>
+              Téléphone{" "}
+              <span className="contact-form-optional">(facultatif)</span>
             </label>
-            <input {...fieldProps("phone")} type="tel" autoComplete="tel" maxLength={20} />
+            <input
+              {...fieldProps("phone")}
+              type="tel"
+              autoComplete="tel"
+              maxLength={20}
+            />
             {fieldError("phone")}
           </div>
           <div className="contact-form-field">
@@ -168,7 +191,8 @@ export default function ContactForm() {
 
         <div className="contact-form-field">
           <label htmlFor="contact-vehicle" className="contact-form-label">
-            Immatriculation ou VIN <span className="contact-form-optional">(facultatif)</span>
+            Immatriculation ou VIN{" "}
+            <span className="contact-form-optional">(facultatif)</span>
           </label>
           <input
             {...fieldProps("vehicle")}
@@ -209,7 +233,8 @@ export default function ContactForm() {
             aria-invalid={Boolean(errors.consent)}
           />
           <span>
-            J'accepte que mes informations soient utilisées pour traiter ma demande (voir nos{" "}
+            J'accepte que mes informations soient utilisées pour traiter ma
+            demande (voir nos{" "}
             <Link to="/mentions-legales">mentions légales</Link>).
           </span>
         </label>

@@ -11,49 +11,33 @@ import { headerCategories } from "./categories";
 import logo from "../../assets/images/logo.png";
 import { formatPrice } from "../../utils/formatPrice";
 
+function UserIcon() {
+  return (
+    <svg className="header-account-icon" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7" />
+    </svg>
+  );
+}
+
 export default function Header() {
-  const [isHidden, setIsHidden] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const dispatch = useDispatch();
   const openCategory = useOpenCategory();
   const token = useSelector((state) => state.user.isAuthenticated);
   const cartItems = useSelector((state) => state.cart.items);
   const cartTotals = useSelector((state) => state.cart.totals);
-  const wishlistItems = useSelector((state) => state.wishlist.items);
+  // const wishlistItems = useSelector((state) => state.wishlist.items);
 
   const cartCount = cartItems.reduce(
     (total, item) => total + (Number(item.quantity) || 0),
     0,
   );
 
+  // Le header reste visible ; il devient simplement plus opaque dès qu'on défile
   useEffect(() => {
-    let lastScrollY = window.scrollY;
-    let ticking = false;
-    const threshold = 10;
-    const updateScroll = () => {
-      const y = window.scrollY;
-      setIsScrolled(y > 0);
-      if (y <= 0) {
-        setIsHidden(false);
-        lastScrollY = 0;
-        ticking = false;
-        return;
-      }
-      const delta = y - lastScrollY;
-      if (Math.abs(delta) > threshold) {
-        setIsHidden(delta > 0);
-        lastScrollY = y;
-      }
-      ticking = false;
-    };
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(updateScroll);
-        ticking = true;
-      }
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 0);
+    handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -62,11 +46,7 @@ export default function Header() {
     dispatch(openModal({ name: "auth", props: { view: "login" } }));
 
   return (
-    <header
-      className={`header ${isHidden ? "header-hidden" : ""} ${
-        isScrolled ? "header-scrolled" : ""
-      }`}
-    >
+    <header className={`header ${isScrolled ? "header-scrolled" : ""}`}>
       <div className="header-topbar">
         {site.topbar.map((message) => (
           <span key={message} className="header-topbar-item">
@@ -101,7 +81,11 @@ export default function Header() {
 
         <div className="header-info header-account">
           <span className="header-account-heading">
-            <svg className="header-account-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="header-account-heading-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <circle cx="12" cy="8" r="4" />
               <path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8" />
             </svg>
@@ -109,8 +93,12 @@ export default function Header() {
           </span>
           {token ? (
             <span className="header-account-links">
-              <Link to="/profile" className="header-info-value">
-                Mon compte
+              <Link
+                to="/profile"
+                className="header-info-value header-account-link"
+              >
+                <UserIcon />
+                <span className="header-account-caption">Mon compte</span>
               </Link>
               <button
                 type="button"
@@ -126,12 +114,16 @@ export default function Header() {
               className="header-info-value header-login"
               onClick={openLogin}
             >
-              S'inscrire / Se connecter
+              <UserIcon />
+              <span className="header-account-text">
+                S'inscrire / Se connecter
+              </span>
+              <span className="header-account-caption">Connexion</span>
             </button>
           )}
         </div>
 
-        <Link
+        {/* <Link
           to="/wishlist"
           className="header-wishlist"
           aria-label={`Favoris (${wishlistItems.length})`}
@@ -144,21 +136,43 @@ export default function Header() {
               {wishlistItems.length > 9 ? "9+" : wishlistItems.length}
             </span>
           )}
-        </Link>
+        </Link> */}
 
         <Link
           to="/panier"
           className="header-cart"
           aria-label={`Mon panier (${cartCount} article${cartCount > 1 ? "s" : ""})`}
         >
+          {/* Version mobile : caddie + pastille du nombre d'articles */}
+          <span className="header-cart-icon">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M2 3h3l2.4 11.2a1.5 1.5 0 0 0 1.5 1.2h8.7a1.5 1.5 0 0 0 1.5-1.1L21 7H6.2" />
+              <circle cx="9.5" cy="20" r="1.5" />
+              <circle cx="17.5" cy="20" r="1.5" />
+            </svg>
+            {cartCount > 0 && (
+              // La clé relance l'animation à chaque ajout
+              <span key={cartCount} className="header-badge header-cart-badge">
+                {cartCount > 99 ? "99+" : cartCount}
+              </span>
+            )}
+          </span>
+          <span className="header-cart-caption">Mon panier</span>
           <span className="header-cart-count">{cartCount} · Mon panier</span>
           <span className="header-cart-total">
-            <svg className="header-cart-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              className="header-cart-total-icon"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <circle cx="9" cy="20" r="1.5" />
               <circle cx="18" cy="20" r="1.5" />
               <path d="M2 3h3l2.6 12.4a1 1 0 0 0 1 .8h9.7a1 1 0 0 0 1-.8L21 7H6" />
             </svg>
-            {formatPrice(cartTotals?.total_price, cartTotals?.currency_minor_unit)}
+            {formatPrice(
+              cartTotals?.total_price,
+              cartTotals?.currency_minor_unit,
+            )}
           </span>
         </Link>
       </div>

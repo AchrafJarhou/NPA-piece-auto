@@ -48,9 +48,11 @@ export const site = {
   // Textes de la fiche produit
   product: {
     pickupTitle: "En stock immédiat comptoir Capelette",
-    pickupText: "Retrait gratuit sous 1h au 158 Av. de la Capelette, 13010 Marseille.",
+    pickupText:
+      "Retrait gratuit sous 1h au 158 Av. de la Capelette, 13010 Marseille.",
     deliveryTitle: "Livrable demain à Marseille & Bouches-du-Rhône (13)",
-    deliveryText: "Commandez avant 16h30 pour livraison matinale en atelier ou domicile.",
+    deliveryText:
+      "Commandez avant 16h30 pour livraison matinale en atelier ou domicile.",
     helpTitle: "Un doute sur votre montage ?",
     helpText:
       "Envoyez votre immatriculation ou carte grise par WhatsApp pour vérification atelier immédiate.",
@@ -61,10 +63,11 @@ export const site = {
 
   // Textes du panier
   cart: {
-    storeBanner: "Comptoir Marseille Capelette (13010)",
-    pickupInStock: "Retrait au comptoir dans 2h, articles en stock",
-    pickupOnOrder: "Retrait au comptoir dès réception des articles sur commande",
-    itemsNote: "Toutes les pièces sont neuves & certifiées OEM",
+    // storeBanner: "Comptoir Marseille Capelette (13010)",
+    // pickupInStock: "Retrait au comptoir dans 2h, articles en stock",
+    pickupOnOrder:
+      "Retrait au comptoir dès réception des articles sur commande",
+    // itemsNote: "Toutes les pièces sont neuves & certifiées OEM",
     // Textes affichés sous chaque mode de livraison. Les titres, les prix et les seuils
     // de gratuité viennent de WooCommerce : "match" est comparé au type du mode ou à son nom.
     shippingModes: [
@@ -104,7 +107,8 @@ export const site = {
       { value: "autre", label: "Autre demande" },
     ],
     successTitle: "Message envoyé",
-    successText: "Merci, notre équipe du comptoir Capelette vous répond au plus vite.",
+    successText:
+      "Merci, notre équipe du comptoir Capelette vous répond au plus vite.",
   },
 
   // Note Google affichée dans le panier (statique pour l'instant)

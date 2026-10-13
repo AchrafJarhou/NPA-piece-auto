@@ -128,6 +128,11 @@ export default function CheckoutForm() {
             ],
             billing_address: { ...toStoreAddress(finalBilling), email },
             shipping_address: toStoreAddress(shippingAddress),
+            // Immatriculation / VIN saisi dans le panier, enregistré sur la commande
+            // pour le technicien (mu-plugins/vehicle-check.php)
+            extensions: {
+              npa: { vehicle_check: cart.vehicleCheck || "" },
+            },
           }),
         },
       );

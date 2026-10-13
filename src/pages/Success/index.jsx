@@ -53,12 +53,13 @@ export default function Success() {
             <section className="success-page-card">
               <h1 className="success-page-title">Commande introuvable</h1>
               <p className="success-page-text">
-                Nous ne pouvons pas afficher cette commande. Si vous êtes client, connectez-vous
-                pour la retrouver dans votre espace, ou contactez le comptoir.
+                Nous ne pouvons pas afficher cette commande. Si vous êtes
+                client, connectez-vous pour la retrouver dans votre espace, ou
+                contactez le comptoir.
               </p>
               <div className="success-page-actions">
-                <Link to="/catalogue" className="btn btn-primary">
-                  Retour au catalogue
+                <Link to="/" className="btn btn-primary">
+                  Retour à l'accueil
                 </Link>
                 <Link to="/contact" className="btn btn-light">
                   Contacter le comptoir
@@ -77,15 +78,25 @@ export default function Success() {
 
                   {!token && (
                     <section className="success-page-card">
-                      <h2 className="success-page-subtitle">Suivez vos prochaines commandes</h2>
+                      <h2 className="success-page-subtitle">
+                        Suivez vos prochaines commandes
+                      </h2>
                       <p className="success-page-text">
-                        Vous avez commandé en invité. Créez votre compte pour retrouver toutes
-                        vos commandes et leur suivi dans votre espace client.
+                        Vous avez commandé en invité. Créez votre compte pour
+                        retrouver toutes vos commandes et leur suivi dans votre
+                        espace client.
                       </p>
                       <button
                         type="button"
                         className="btn btn-dark success-page-account"
-                        onClick={() => dispatch(openModal({ name: "auth", props: { view: "register" } }))}
+                        onClick={() =>
+                          dispatch(
+                            openModal({
+                              name: "auth",
+                              props: { view: "register" },
+                            }),
+                          )
+                        }
                       >
                         Créer mon compte
                       </button>

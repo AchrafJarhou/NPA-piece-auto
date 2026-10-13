@@ -13,9 +13,8 @@ import ReassuranceBand from "../../components/ReassuranceBand";
 import Loader from "../../components/Loader";
 
 export default function Cart() {
-  const { items, totals, needs_shipping, shipping_rates, loading } = useSelector(
-    (state) => state.cart,
-  );
+  const { items, totals, needs_shipping, shipping_rates, loading } =
+    useSelector((state) => state.cart);
 
   // Retrait sous 2h seulement si aucun article n'est sur commande
   const allInStock = items.every((item) => !item.show_backorder_badge);
@@ -35,6 +34,9 @@ export default function Cart() {
               <p className="cart-page-empty-text">
                 Trouvez vos pièces dans le catalogue ou par véhicule.
               </p>
+              <Link to="/" className="btn btn-primary">
+                Retour à l'accueil
+              </Link>
             </div>
           ) : (
             <div className="cart-page-layout">
@@ -42,7 +44,7 @@ export default function Cart() {
                 <CartStoreBanner allInStock={allInStock} />
                 <CartItems items={items} />
                 <CartCompatibility />
-                <Coupon />
+                {/* <Coupon /> */}
                 <Link to="/catalogue" className="cart-page-continue">
                   ← Poursuivre mes achats de pièces
                 </Link>
@@ -53,7 +55,7 @@ export default function Cart() {
                   <CartShipping allInStock={allInStock} />
                 )}
                 <CartSummary />
-                <CartGoogleRating />
+                {/* <CartGoogleRating /> */}
               </aside>
             </div>
           )}

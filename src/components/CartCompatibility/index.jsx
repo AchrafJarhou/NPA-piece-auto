@@ -62,6 +62,9 @@ export default function CartCompatibility() {
             aria-invalid={Boolean(error)}
             maxLength={20}
           />
+          <button type="submit" className="btn btn-primary cart-compatibility-submit">
+            Valider
+          </button>
         </form>
         {error && <span className="cart-compatibility-error">{error}</span>}
         {!error && saved && (

@@ -5,17 +5,11 @@
   top: 0;
   z-index: 100;
   color: var(--white-color);
-  transition:
-    transform 0.3s ease,
-    background-color 0.3s ease;
+  transition: background-color 0.3s ease;
 
   // Le header devient opaque quand on fait défiler la page
   &.header-scrolled {
     background-color: var(--overlay-strong);
-  }
-
-  &.header-hidden {
-    transform: translateY(-100%);
   }
 
   // Remise à zéro des styles globaux des boutons
@@ -49,7 +43,7 @@
   overflow-x: auto;
   white-space: nowrap;
   scrollbar-width: none;
-  background-color: var(--overlay-medium);
+  background-color: rgba(0, 0, 0, 0.8);
 
   &::-webkit-scrollbar {
     display: none;
@@ -78,7 +72,7 @@
   align-items: center;
   gap: 10px var(--gutter);
   padding: 8px var(--gutter);
-  background-color: var(--overlay-light);
+  background-color: rgba(0, 0, 0, 0.7);
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
@@ -93,7 +87,7 @@
   display: block;
   flex-shrink: 0;
   width: auto;
-  height: 40px;
+  height: 56px;
   border-radius: 3px;
 }
 
@@ -133,10 +127,12 @@
     height: auto;
   }
 
-  .autocomplete-input {
+  // .autocomplete en plus : le style du composant Autocomplete est chargé après
+  // celui du header et remettrait son propre padding
+  .autocomplete .autocomplete-input {
     width: 100%;
     margin: 0;
-    padding: 7px 12px;
+    padding: 13px 14px;
     border: 0;
     border-radius: var(--radius-sm);
     background-color: var(--white-color);
@@ -158,11 +154,11 @@
 .header-search-button {
   display: flex;
   align-items: center;
-  padding: 7px 22px;
+  padding: 0 16px;
   border-radius: var(--radius-sm);
   background-color: var(--primary-color);
   font-family: var(--font-heading);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   letter-spacing: var(--letter-spacing-wide);
   line-height: 1.5;
@@ -209,7 +205,8 @@
   gap: 6px;
 }
 
-.header-account-icon {
+// Petite icône à côté de « Espace client » (version ordi)
+.header-account-heading-icon {
   width: 14px;
   height: 14px;
   fill: none;
@@ -229,6 +226,23 @@
   font-size: 11px;
   text-decoration: underline;
   color: var(--text-color-subtle);
+}
+
+// Les textes reprennent la couleur et la taille du lien ou du bouton
+// (sinon la règle globale des span les passe en noir)
+.header-account-text,
+.header-account-caption,
+.header-cart-caption {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+// Icône et légende courte : affichées seulement sur mobile
+.header-account-icon,
+.header-login .header-account-caption {
+  display: none;
 }
 
 /* ---------- Favoris et panier ---------- */
@@ -280,6 +294,12 @@
   }
 }
 
+// Caddie et légende : affichés seulement sur mobile
+.header-cart-icon,
+.header-cart-caption {
+  display: none;
+}
+
 .header-cart-count {
   font-size: 11px;
   line-height: 1.2;
@@ -300,7 +320,8 @@
   color: var(--dark-color);
 }
 
-.header-cart-icon {
+// Caddie à côté du total (version ordi)
+.header-cart-total-icon {
   width: 18px;
   height: 18px;
   fill: none;
@@ -317,7 +338,7 @@
   padding: 0 var(--gutter);
   overflow-x: auto;
   scrollbar-width: none;
-  background-color: rgba(0, 0, 0, 0.25);
+  background-color: rgba(0, 0, 0, 0.6);
 
   &::-webkit-scrollbar {
     display: none;
@@ -333,6 +354,16 @@
   min-width: 92px;
   padding: 8px 2px 7px;
   text-align: center;
+
+  // Bloc centré quand il y a la place ; sinon il défile depuis la gauche
+  // (justify-content: center couperait le début de la liste)
+  &:first-child {
+    margin-left: auto;
+  }
+
+  &:last-child {
+    margin-right: auto;
+  }
 
   .header &:hover .header-category-label {
     color: var(--primary-color);
@@ -397,12 +428,94 @@
 }
 
 @include mobile {
-  .header-brand-tagline,
-  .header-account .header-info-label {
+  // Seul le logo reste à gauche
+  .header-brand-text,
+  .header-account-heading,
+  .header-account-text,
+  .header-cart-count,
+  .header-cart-total {
     display: none;
   }
 
+  .header-logo {
+    height: 44px;
+  }
+
   .header-search-button {
-    padding: 7px 14px;
+    padding: 0 12px;
+  }
+
+  // Compte et panier : icône avec une légende en dessous
+  .header-login,
+  .header-account-link,
+  .header-cart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+
+  .header-account-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  .header-account-icon,
+  .header-cart-icon svg {
+    display: block;
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .header-login .header-account-caption,
+  .header-account-caption,
+  .header-cart-caption {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    line-height: 1;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  .header-cart {
+    padding: 0;
+    background-color: transparent;
+    color: var(--white-color);
+
+    .header &:hover {
+      background-color: transparent;
+      color: var(--primary-color);
+    }
+  }
+
+  .header-cart-icon {
+    position: relative;
+    display: flex;
+    color: inherit;
+  }
+
+  .header-cart-badge {
+    animation: header-badge-pop 0.3s ease;
+  }
+}
+
+@keyframes header-badge-pop {
+  0% {
+    transform: scale(0.4);
+  }
+  70% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
   }
 }

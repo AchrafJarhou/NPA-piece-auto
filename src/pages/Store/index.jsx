@@ -26,9 +26,13 @@ export default function Store() {
   const filters = useSelector((state) => state.filters);
   const { list, loading, error } = useSelector((state) => state.products);
   const categories = useSelector((state) => state.categories.items);
-  const { attributes, definitionsLoaded } = useSelector((state) => state.catalogue);
+  const { attributes, definitionsLoaded } = useSelector(
+    (state) => state.catalogue,
+  );
 
-  const category = categories.find((cat) => String(cat.id) === filters.category);
+  const category = categories.find(
+    (cat) => String(cat.id) === filters.category,
+  );
   const recommendation = categoryContent[category?.slug]?.recommendation;
 
   // Du véhicule, seul l'identifiant compte pour les requêtes (les noms servent à l'affichage)
@@ -46,7 +50,9 @@ export default function Store() {
   }, [categories.length, definitionsLoaded, dispatch]);
 
   useEffect(() => {
-    dispatch(fetchProductsThunk({ ...JSON.parse(queryKey), per_page: PER_PAGE }));
+    dispatch(
+      fetchProductsThunk({ ...JSON.parse(queryKey), per_page: PER_PAGE }),
+    );
   }, [queryKey, dispatch]);
 
   // Véhicule mémorisé qui n'existe plus dans WordPress : on l'oublie
@@ -103,13 +109,13 @@ export default function Store() {
             {!error && !loading && products.length === 0 && (
               <div className="store-page-message">
                 <p>Aucune pièce ne correspond à votre recherche.</p>
-                <button
+                {/* <button
                   type="button"
                   className="btn btn-dark"
                   onClick={() => dispatch(resetSidebarFilters())}
                 >
                   Retirer les filtres
-                </button>
+                </button> */}
               </div>
             )}
 
