@@ -425,6 +425,17 @@
     padding-left: 16px;
     padding-right: 16px;
   }
+
+  // Bandeau du haut : seuls les 2 premiers messages (comptoir ouvert + téléphone),
+  // pour que tout tienne sur la largeur sans faire défiler
+  .header-topbar {
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .header-topbar-item:nth-child(n + 3) {
+    display: none;
+  }
 }
 
 @include mobile {
